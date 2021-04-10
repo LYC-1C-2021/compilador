@@ -10,8 +10,15 @@ UNLaM - Lenguajes y Compiladores - 1er Cuatrimestre 2021
 
 
 ### Compilar analizador léxico
+
+Proyecto principal
 ```
 $ make
+```
+
+Ejercicios practicos
+```
+$ make ejercicio nro=1
 ```
 
 ### Ejecutar
