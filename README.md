@@ -11,10 +11,10 @@ UNLaM - Lenguajes y Compiladores - 1er Cuatrimestre 2021
 
 ### Compilar analizador léxico
 ```
-$ build.sh
+$ make
 ```
 
 ### Ejecutar
 ```
-$ run.sh
+$ make run
 ```
