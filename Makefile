@@ -4,12 +4,12 @@ build: clean
 	mkdir bin && cd src &&  flex lexico.l && gcc lex.yy.c -o ../bin/lexico && cd ..
 
 ejercicio: clean
-	@echo Building proyect
+	@echo Building proyect ejercicio${nro}
 	mkdir bin && cd src/practica/ejercicio$(nro) &&  flex lexico.l && gcc lex.yy.c -o ../../../bin/lexico && cd ..
 
 run:
 	@echo Running Project
-	bin/lexico
+	bin/lexico ${file}
 
 clean:
 	@echo Cleaning proyect
