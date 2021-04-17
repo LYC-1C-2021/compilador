@@ -2,6 +2,7 @@
 # ifndef TOKEN_H_
 # define TOKEN_H_
 
+// Los tokens deberian se una enumeración o valores enteros
 # define TOKEN_DIGITO "DIGITO"
 # define TOKEN_LETRA "LETRA"
 # define TOKEN_ID "ID"

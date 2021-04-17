@@ -73,6 +73,7 @@ CONSTANTE_STRING    ["][^"]*["]
 "\n"
 "\r"
 "\r\n"
+"\n\t"
 " "
 ";"
 
@@ -88,6 +89,7 @@ int main(int argc, char *argv[]) {
     } else {
       printf("Error abriendo el archivo de entrada\n");
     }
+    fclose(yyin);
   }
 }
 
