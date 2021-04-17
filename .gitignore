@@ -2,5 +2,9 @@
 .DS_Store
 
 lex.yy.c
+lexico.c
+sintactico.c
+sintactico.h
+sintactico.output
 bin/**
 *.o
