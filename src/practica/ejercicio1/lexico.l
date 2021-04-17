@@ -29,7 +29,7 @@ PATENTE_MERCOSUR  ^({ARG_AUTO}|{ARG_MOTO}|{BRA_AUTO}|{BRA_MOTO}|{BOL_AUTO}|{PAR_
 COMENTARIO (\/\*)([" "|\n|\t]*[a-zA-Z]*)*(\*\/)
 /* 1.d) */
 /* necesito permitir ids de una sola letra */
-ID ^[aA-zZ]([aA-zZ]|[0-9]|[-])*(([aA-zZ]|[0-9]))$ | [aA-zZ]
+ID (^[aA-zZ]([aA-zZ]|[0-9]|[-])*(([aA-zZ]|[0-9]))$)|(^[aA-zZ]$)
 /* 1.e) */
 CONSTANTE_DECIMAL       ^[1-9][0-9]*$
 CONSTANTE_OCTAL         ^(0[o]?)[0-7]*$

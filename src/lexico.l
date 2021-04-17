@@ -1,23 +1,31 @@
 /* Definiciones */
 %{
-  // TODO: Incluir codigo C
-  # define TOKEN_DIGITO "DIGITO"
-  # define TOKEN_LETRA "LETRA"
+  # include "sintactico.h"
+
+  void yyerror (char const *s);
 %}
 
 /* Opciones y RegEx */
 %option noyywrap
 
-DIGITO [0-9]
-LETRA [aA-zZ]
+DIGITO    [0-9]
+LETRA     [aA-zZ]
 
 /* Reglas y acciones */
 %%
-{DIGITO} { printf("%s", TOKEN_DIGITO); }
-{LETRA} { printf("%s", TOKEN_LETRA); }
+{DIGITO} { printf("DIGITO: %d\n", DIGITO); return DIGITO; }
+{LETRA} { printf("LETRA: %d\n", LETRA); return LETRA;}
+
+"\t"
+"\n"
+"\r\n"
+"\n\t"
+" " 
+
+. { yyerror("ERROR: caracter desconocido"); }
+
 %%
 
-/* Código */
-int main() {
-  yylex();
+void yyerror (char const *s) {
+   fprintf (stderr, "%s\n", s);
 }
