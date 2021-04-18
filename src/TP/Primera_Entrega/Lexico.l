@@ -7,6 +7,10 @@
 #include "y.tab.h"
 
 FILE  *yyin;
+int yylval;
+char *yyltext;
+
+int yerror(void);
 
 void guardarTS_Archivo();
 void guardarLexemas(char *,int);
@@ -32,11 +36,11 @@ tsimbolos ts[100]; //pila con lexemas para agregar a la TS, puede guardar 100 le
 %option noyywrap  
 %option yylineno 
 
-DIGITO		 	[0-9]
-LETRA 			[a-zA-Z]
 
-ID   		 	{LETRA}({LETRA}|{DIGITO}|"_")*
-CTE_INT      	{DIGITO}+
+DIGITO [0-9]
+LETRA  [a-zA-Z]
+ID    {LETRA}({LETRA}|{DIGITO}|"_")*
+CTE_INT       {DIGITO}+
 CTE_REAL		{DIGITO}+"."{DIGITO}+|{DIGITO}*"."{DIGITO}+|{DIGITO}+"."{DIGITO}*
 COMILLAS	   	"\""
 ESPACIO			" "
@@ -44,28 +48,28 @@ CTE_STR         \"[^\n]+\"
 COMENT_SIMPLE	"-/"({LETRA}|{DIGITO}|_|{ESPACIO}|":"|"="|"."|"+"|"("|")"|"["|"]"|",")*"/-"
 COMENT_DOBLE	"-/"({LETRA}|{DIGITO}|_|{ESPACIO}|":"|"="|"."|"+"|"("|")"|"["|"]"|","|{COMENT_SIMPLE})*"/-"
 
+
 FLOAT			"FLOAT"|"float"|"Float"
 INTEGER			"INTEGER"|"integer"|"Integer"
 STRING			"STRING"|"string"|"String"
 
-IF     			"IF"|"if"|"If"
-ENDIF   		"ENDIF"|"endif"|"Endif"
-THEN    		"THEN"|"then"|"Then"
-ELSE   			"ELSE"|"else"|"Else"
-WHILE  			"WHILE"|"while"|"While"
-ENDWHILE 		"ENDWHILE"|"endwhile"|"Endwhile"
-DECVAR 			"DECVAR"|"decvar"|"Decvar"
-ENDDEC 			"ENDDEC"|"enddec"|"Enddec" 
+IF     		"IF"|"if"|"If"
+ENDIF   	"ENDIF"|"endif"|"Endif"
+THEN    	"THEN"|"then"|"Then"
+ELSE   		"ELSE"|"else"|"Else"
+WHILE  		"WHILE"|"while"|"While"
+ENDWHILE 	"ENDWHILE"|"endwhile"|"Endwhile"
 
-AND				"AND"|"and"|"And"
-OR				"OR"|"or"|"Or"
-NOT				"NOT"|"not"|"Not"
 
-WRITE 			"WRITE"|"write"|"Write"
-READ 			"READ"|"read"|"Read"
-
+AND			"AND"|"and"|"And"
+OR			"OR"|"or"|"Or"
+NOT			"NOT"|"not"|"Not"
+WRITE 		"WRITE"|"write"|"Write"
+READ 		"READ"|"read"|"Read"
 %%
-	
+
+"DECVAR"		{ return DECVAR; }
+"ENDDEC"		{ return ENDDEC; }		
 {FLOAT}			{capturaTipo(yytext); return FLOAT; }
 {INTEGER}		{capturaTipo(yytext);return INTEGER; }
 {STRING}		{capturaTipo(yytext);return STRING;}
@@ -79,19 +83,25 @@ READ 			"READ"|"read"|"Read"
 {ENDIF}			{ return ENDIF; }
 {WHILE}        	{ return WHILE; }
 {ENDWHILE}     	{ return ENDWHILE; }
-{DECVAR}		{ return DECVAR; }
-{ENDDEC}		{ return ENDDEC; }
 {WRITE}	    	{ return WRITE; }
 {READ}	    	{ return READ; }
 {COMENT_SIMPLE}	{  }
 {COMENT_DOBLE}	{  }
 
-"=="			{ return IGUAL; }
-"<>"			{ return DIST; }
-"<"				{ return MENOR; }
-">"				{ return MAYOR; }
-"<="			{ return MEN_IG; }
-">="			{ return MAY_IG; }
+
+
+
+
+
+
+"=="		{ return IGUAL; }
+"<>"		{ return DIST; }
+"<"			{ return MENOR; }
+">"			{ return MAYOR; }
+"<="		{ return MEN_IG; }
+">="		{ return MAY_IG; }
+
+
 
 {CTE_STR}		{
                     int longitud=strlen(yytext);
@@ -99,15 +109,15 @@ READ 			"READ"|"read"|"Read"
 					{
 					 guardarLexemas(yytext,1);
                      return CTE_STR;
-					}
-					else
-					{
+					 }
+					else{
 						printf("-------------ERROR-------------\n");
 						printf("Cte string fuera de rango.\n");
 						system ("Pause");
 						exit(1);
 					} 
 			    }
+				
 
 {CTE_INT}		{	int num = atoi(yytext); 
 					
@@ -143,6 +153,7 @@ READ 			"READ"|"read"|"Read"
 
 {ID}     	{guardarLexemas(yytext,0);return ID; }
 
+
 ","			{ return COMA;}
 ";"			{ return PUNTO_COMA;}
 ":="		{ return OPE_ASIG; }
@@ -159,10 +170,13 @@ READ 			"READ"|"read"|"Read"
 "{"			{ return L_A; }
 "}"			{ return L_C; }
 
+
 "\n"      		
 "\t"
 " "	
 "\r\n" 
+
+. yerror();	
 
 %%
 
@@ -190,15 +204,17 @@ int x;
 void guardarLexemas(char *lexema,int val)
 {
   
-    if(val==0)
+     if(val==0)
 	{
+      
 	   if(buscar(lexema)!=0)
 	   {
 	      strcpy(ts[i].lexema,lexema);
 		  i++;//incremento para conocer la cantidad de id que hay en la ctes
 	   } 
+	 
+	
 	}
-
     if(val==1)
 	{
 	    char *s=lexema;
@@ -212,37 +228,45 @@ void guardarLexemas(char *lexema,int val)
 		}
 	    memset(s, '\0',n);//marco el fin del string
 		
-	  	if(buscar(lexema)!=0)
-	 	{
-			strcpy(ts[i].lexema,"_");
-			strcat(ts[i].lexema,lexema);;
-			strcpy(ts[i].valor,lexema);
-			itoa(strlen(lexema),ts[i].longitud,10);	
-			i++;//incremento para conocer la cantidad de id que hay en la ctes				   
-      	}
+	  if(buscar(lexema)!=0)
+	  {
+	   
+	   strcpy(ts[i].lexema,"_");
+       strcat(ts[i].lexema,lexema);;
+	   strcpy(ts[i].valor,lexema);
+	   itoa(strlen(lexema),ts[i].longitud,10);	
+        i++;//incremento para conocer la cantidad de id que hay en la ctes				   
+      }
+	
 	} 
+   if(val==2)
+	{
 
-    if(val==2)
-	{
-		if(buscar(lexema)!=0)
-		{
-			strcpy(ts[i].lexema,"_");
-			strcat(ts[i].lexema,lexema);
-			strcpy(ts[i].valor,lexema);
-			i++;//incremento para conocer la cantidad de id que hay en la ctes
-		}
-	}
+    if(buscar(lexema)!=0)
+	 {
+	   strcpy(ts[i].lexema,"_");
+       strcat(ts[i].lexema,lexema);
+	   strcpy(ts[i].valor,lexema);
+	 
+	    i++;//incremento para conocer la cantidad de id que hay en la ctes
+      }
+			
     
-	if(val==3)
+	}
+     if(val==3)
 	{
-		if(buscar(lexema)!=0)
-		{
-			strcpy(ts[i].lexema,"_");
-			strcat(ts[i].lexema,lexema);
-			strcpy(ts[i].valor,lexema);
-			i++;//incremento para conocer la cantidad de id que hay en la ctes
-		}
+
+    if(buscar(lexema)!=0)
+	 {
+	   strcpy(ts[i].lexema,"_");
+       strcat(ts[i].lexema,lexema);
+	   strcpy(ts[i].valor,lexema);
+	   i++;//incremento para conocer la cantidad de id que hay en la ctes
+      }
+			
+    
 	}	
+	      
 }
 
 int buscar(char * lexema)
@@ -255,8 +279,12 @@ int buscar(char * lexema)
    return 1;
 }
 
+
+
 void capturaTipo(char * tvar)
  {
 	strcpy(ts[k].tipoDato,tvar);
 	k++;
 }
+
+

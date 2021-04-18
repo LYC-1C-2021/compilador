@@ -1,0 +1,7 @@
+lexema                 Tipo           Valor                       Longitud
+contador               Integer                                    
+promedio               Float                                      
+actual                 Float                                      
+suma                   Float                                      
+nombre                                                            
+_85                                   85                          

@@ -4,16 +4,16 @@ variable1 : STRING
 p1, p2, p3 : FLOAT
 ENDDEC
 
-a1 = 99999.99
-a2 = 99.
-a3 = .9999
+a1 := 99999.99
+a2 := 99.
+a3 := .9999
 
 variable1 = “@sdADaSjfla%dfg”
 variable1 = “asldk fh sjf”
 
 -/ Realizo una selección /-
 IF (a <= 30)
-	b = ”correcto” -/ asignación string /-
+	b := ”correcto” -/ asignación string /-
 ELSE
 	a1:=a2
 	
