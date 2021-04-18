@@ -2,15 +2,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <conio.h>
+#if defined(_WIN32)
+	#include <conio.h>
+#endif
 #include <errno.h>
 #include "y.tab.h"
 
 int yystopparser=0;
 char * yytext;
-                
+
 FILE  *yyin;
 
+int yyerror();
+int yylex();
+
+void guardarTS_Archivo();
 
 %}
 
@@ -24,7 +30,7 @@ FILE  *yyin;
 %token FLOAT
 %token REAL
 %token COMA
-%token ID 
+%token ID
 %token OPE_ASIG
 %token OPE_SUM
 %token OPE_RES
@@ -58,20 +64,20 @@ FILE  *yyin;
 %token L_C
 
 %%
-programa:   
-		 declaracion inicio | declaracion {printf("\n---------------------------\n");}			
-										  {printf("\n****COMPILACION EXITOSA****\n");}	
+programa:
+		 declaracion inicio | declaracion {printf("\n---------------------------\n");}
+										  {printf("\n****COMPILACION EXITOSA****\n");}
 										  {printf("\n---------------------------\n");}
 ;
 
 declaracion: DECVAR definicion ENDDEC 	{printf("\n***REGLA 1 -> Declaracion:\n");}
-										{printf("\t\t\tDeclaracion\n");} 
+										{printf("\t\t\tDeclaracion\n");}
 ;
- 
+
 definicion: lista_id |  lista_id definicion	{printf("\n***REGLA 2 -> Declaracion:\n");}
-											{printf("\t\t\tDefiniciones\n");} 
+											{printf("\t\t\tDefiniciones\n");}
 ;
-           
+
 inicio:	 lista_sentencias 	{printf("\n***REGLA 3 -> Inicio:\n");}
 												{printf("\t\t\tLista_Sentencias\n");}
 	;
@@ -90,22 +96,22 @@ sentencia:asignacion	{printf("\n***REGLA 6 -> Sentencia:\n");}
 		  |entrada		{printf("\n***REGLA 9 -> Sentencia:\n");}
 						{printf("\t\t\tEntrada\n");}
 		  |salida       {printf("\n***REGLA 10 -> Sentencia:\n");}
-						{printf("\t\t\tSalida\n");} 
+						{printf("\t\t\tSalida\n");}
 		  |constante    {printf("\n***REGLA 11 -> Sentencia:\n");}
-						{printf("\t\t\tConstante\n");}						
+						{printf("\t\t\tConstante\n");}
 ;
 
-asignacion: ID OPE_ASIG expresion PUNTO_COMA	{printf("\n***REGLA 12 -> Asignacion:\n");}	
+asignacion: ID OPE_ASIG expresion PUNTO_COMA	{printf("\n***REGLA 12 -> Asignacion:\n");}
 												{printf("\t\t\tID OPE_ASIG Expresion\n");}
 ;
-     
+
 lista_id: ID DOS_PUNTOS tipo_dato {printf("\n***REGLA 13 -> Lista_Id:\n");}
 			{printf("\t\t\tID\n");}
          |ID  COMA lista_id		{printf("\n***REGLA 14 -> Lista_Id:\n");}
 								{printf("\t\t\tID COMA Lista_Id\n");}
 ;
 
- 
+
 tipo_dato:INTEGER 				        {printf("\n***REGLA 15 -> Tipo_Dato:\n");}
 										{printf("\t\t\tInteger\n");}
           |STRING 						{printf("\n***REGLA 16 -> Tipo_Dato:\n");}
@@ -129,7 +135,7 @@ decision:IF condicion L_A lista_sentencias L_C  {printf("\n***REGLA 23 -> Condic
 													{printf("\t\t\t IF Condicion L_A Lista_Sentencias L_C\n");}
          |IF condicion L_A lista_sentencias L_C ELSE L_A lista_sentencias L_C
 				{printf("\n***REGLA 24 -> Condicion:\n");}
-				{printf("\t\t\t IF Condicion L_A Lista_Sentencias L_C ELSE L_A Lista_Sentencias L_C\n");}	
+				{printf("\t\t\t IF Condicion L_A Lista_Sentencias L_C ELSE L_A Lista_Sentencias L_C\n");}
 ;
 
 condicion: P_A condicion_simple P_C	{printf("\n***REGLA 25 -> Condicion:\n");}
@@ -157,9 +163,9 @@ condicion_doble:condicion_simple AND condicion_simple 	{printf("\n***REGLA 34 ->
                 |condicion_simple OR condicion_simple 	{printf("\n***REGLA 35 -> Condicion_Doble:\n");}
 														{printf("\t\t\t Condicion_Simple OR Condicion_Simple\n");}
 ;
-iteracion:WHILE condicion L_A lista_sentencias L_C   	{printf("\n***REGLA 36 -> Iteracion:\n");}   
+iteracion:WHILE condicion L_A lista_sentencias L_C   	{printf("\n***REGLA 36 -> Iteracion:\n");}
 														{printf("\t\t\t WHILE Condicion L_A Lista_Sentencias L_C\n");}
-;  
+;
 
 expresion: termino 								{printf("\n***REGLA 37 -> Expresion:\n"); }
 												{printf("\t\t\t Termino\n");}
@@ -176,7 +182,7 @@ termino:factor 								{printf("\n***REGLA 40 -> Termino:\n");}
        |termino OPE_MUL factor 				{printf("\n***REGLA 42 -> Termino:\n");}
 											{printf("\t\t\t Termino OPE_MUL Factor\n");}
 	   |termino OPE_DIV factor 				{printf("\n***REGLA 43 -> Termino:\n");}
-											{printf("\t\t\t Termino OPE_DIV Factor\n");}		
+											{printf("\t\t\t Termino OPE_DIV Factor\n");}
 ;
 factor: ID 									{printf("\n***REGLA 44 -> Factor:\n");}
 											{printf("\t\t\t ID\n");}
@@ -185,7 +191,7 @@ factor: ID 									{printf("\n***REGLA 44 -> Factor:\n");}
 	   |CTE_REAL 							{printf("***REGLA 46 -> Factor:\n");}
 											{printf("\t\t\t CTE_REAL\n");}
 	   |CTE_STR  							{printf("\n***REGLA 47 -> Factor:\n");}
-											{printf("\t\t\t CTE_STR\n");}	   							
+											{printf("\t\t\t CTE_STR\n");}
 ;
 
 constante: CONST ID OPE_ASIG CTE_INT PUNTO_COMA		{printf("\n***REGLA 48 -> Constante:\n");}
