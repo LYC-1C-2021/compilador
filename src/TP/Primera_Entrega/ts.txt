@@ -1,7 +1,5 @@
 lexema                 Tipo           Valor                       Longitud
-contador               Integer                                    
-promedio               Float                                      
-actual                 Float                                      
-suma                   Float                                      
-nombre                                                            
-_85                                   85                          
+a1                     FLOAT                                      
+a2                                                                
+a3                                                                
+b1                                                                

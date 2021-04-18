@@ -1,26 +1,26 @@
 DECVAR
 a1,a2,a3, b1 : FLOAT
 variable1 : STRING
-p1, p2, p3 : FLOAT
+p1, p2, p3 : INTEGER
 ENDDEC
 
-a1 := 99999.99
-a2 := 99.
-a3 := .9999
+a1 = 99999.99;
+a2 = 99.;
+a3 = .9999;
 
-variable1 = “@sdADaSjfla%dfg”
-variable1 = “asldk fh sjf”
+variable1 = “@sdADaSjfla%dfg”;
+variable1 = “asldk fh sjf”;
 
 -/ Realizo una selección /-
 IF (a <= 30)
-	b := ”correcto” -/ asignación string /-
+	b = ”correcto”; -/ asignación string /-
 ELSE
-	a1:=a2
+	a1:=a2;
 	
 	
-WRITE “ewr” -/ donde “ewr” debe ser una cte string /-
-READ base -/ donde base es una variable /-
-WRITE var1 -/ donde var1 es una vble numérica definida previamente /-
+WRITE “ewr”; -/ donde “ewr” debe ser una cte string /-
+READ base; -/ donde base es una variable /-
+WRITE var1; -/ donde var1 es una vble numérica definida previamente /-
 
 
 

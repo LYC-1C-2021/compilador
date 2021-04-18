@@ -156,7 +156,7 @@ READ 		"READ"|"read"|"Read"
 
 ","			{ return COMA;}
 ";"			{ return PUNTO_COMA;}
-":="		{ return OPE_ASIG; }
+"="		    { return OPE_ASIG; }
 ":"			{ return DOS_PUNTOS; }
 "["			{ return C_A; }
 "]"			{ return C_C; }
@@ -175,6 +175,7 @@ READ 		"READ"|"read"|"Read"
 "\t"
 " "	
 "\r\n" 
+
 
 %%
 

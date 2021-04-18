@@ -59,23 +59,23 @@ FILE  *yyin;
 
 %%
 programa:   
-		 declaracion inicio	{printf("\n---------------------------\n");}			
-							{printf("\n****COMPILACION EXITOSA****\n");}	
-							{printf("\n---------------------------\n");}
-  ;
-  
-declaracion: definicion 	{printf("\n***REGLA 1 -> Declaracion:\n");}
-							{printf("\t\t\tDefiniciones\n");} 
+		 declaracion inicio | declaracion {printf("\n---------------------------\n");}			
+										  {printf("\n****COMPILACION EXITOSA****\n");}	
+										  {printf("\n---------------------------\n");}
 ;
 
-	;
-definicion: DECVAR lista_id ENDDEC
-										{printf("\n***REGLA 2 -> Definicion:\n");}
-										{printf("\t\t\tDECVAR lista_id ENDDEC \n");}
-	;           
+declaracion: DECVAR definicion ENDDEC 	{printf("\n***REGLA 1 -> Declaracion:\n");}
+										{printf("\t\t\tDeclaracion\n");} 
+;
+ 
+definicion: lista_id |  lista_id definicion	{printf("\n***REGLA 2 -> Declaracion:\n");}
+											{printf("\t\t\tDefiniciones\n");} 
+;
+           
 inicio:	 lista_sentencias 	{printf("\n***REGLA 3 -> Inicio:\n");}
 												{printf("\t\t\tLista_Sentencias\n");}
 	;
+
 lista_sentencias:sentencia		{printf("\n***REGLA 4 -> Lista_Sentencias:\n");}
 								{printf("\t\t\tSentencia\n");}
 				|lista_sentencias sentencia		{printf("\n***REGLA 5 -> Lista_Sentencias:\n");}
@@ -98,22 +98,20 @@ sentencia:asignacion	{printf("\n***REGLA 6 -> Sentencia:\n");}
 asignacion: ID OPE_ASIG expresion PUNTO_COMA	{printf("\n***REGLA 12 -> Asignacion:\n");}	
 												{printf("\t\t\tID OPE_ASIG Expresion\n");}
 ;
-
-
+     
+lista_id: ID DOS_PUNTOS tipo_dato {printf("\n***REGLA 13 -> Lista_Id:\n");}
+			{printf("\t\t\tID\n");}
+         |ID  COMA lista_id		{printf("\n***REGLA 14 -> Lista_Id:\n");}
+								{printf("\t\t\tID COMA Lista_Id\n");}
+;
 
  
-tipo_dato:INTEGER 				        {printf("\n***REGLA 13 -> Tipo_Dato:\n");}
+tipo_dato:INTEGER 				        {printf("\n***REGLA 15 -> Tipo_Dato:\n");}
 										{printf("\t\t\tInteger\n");}
-          |STRING 						{printf("\n***REGLA 14 -> Tipo_Dato:\n");}
+          |STRING 						{printf("\n***REGLA 16 -> Tipo_Dato:\n");}
 										{printf("\t\t\tString\n");}
-		  |FLOAT						{printf("\n***REGLA 15 -> Tipo_Dato:\n");}
+		  |FLOAT						{printf("\n***REGLA 17 -> Tipo_Dato:\n");}
 										{printf("\t\t\tFloat\n");}
-;
-          
-lista_id:ID DOS_PUNTOS tipo_dato {printf("\n***REGLA 16 -> Lista_Id:\n");}
-			{printf("\t\t\tID\n");}
-         |ID  COMA lista_id		{printf("\n***REGLA 17 -> Lista_Id:\n");}
-								{printf("\t\t\tID COMA Lista_Id\n");}
 ;
 
 entrada: READ ID PUNTO_COMA		{printf("\n***REGLA 18 -> Entrada: \n");}
