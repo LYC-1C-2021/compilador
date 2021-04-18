@@ -9,19 +9,17 @@ UNLaM - Lenguajes y Compiladores - 1er Cuatrimestre 2021
   - Bruno Sendras
 
 
-### Compilar analizador léxico
+### Para compilar
 
-Proyecto principal
+Primera parte
 ```
-$ make
-```
-
-Ejercicios practicos
-```
-$ make ejercicio nro=1
+cd src\TP\Primera_Entrega
+Flex Lexico.l
+Bison -dyv Sintactico.y
+gcc lex.yy.c y.tab.c -o Primera
 ```
 
 ### Ejecutar
 ```
-$ make run
+.\Primera prueba.txt
 ```
