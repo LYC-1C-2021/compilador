@@ -176,8 +176,6 @@ READ 		"READ"|"read"|"Read"
 " "	
 "\r\n" 
 
-. yerror();	
-
 %%
 
 void guardarTS_Archivo()
