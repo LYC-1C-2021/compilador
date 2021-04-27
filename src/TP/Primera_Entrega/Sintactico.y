@@ -62,7 +62,7 @@ void guardarTS_Archivo();
 %token PUNTO_COMA
 %token L_A
 %token L_C
-%token MOV
+%token MOD
 %token DIV
 
 %%
@@ -73,10 +73,10 @@ programa:
 		 | declaracion {printf("\n---------------------------\n");}
 															{printf("\n****COMPILACION EXITOSA****\n");}
 															{printf("\n---------------------------\n");}
-		 | entrada {printf("\n---------------------------\n");}
+		 | lista_io entrada {printf("\n---------------------------\n");}
 															{printf("\n****COMPILACION EXITOSA****\n");}
 															{printf("\n---------------------------\n");}
-		| salida {printf("\n---------------------------\n");}
+		| lista_io salida {printf("\n---------------------------\n");}
 															{printf("\n****COMPILACION EXITOSA****\n");}
 															{printf("\n---------------------------\n");}
 ;
@@ -112,32 +112,38 @@ sentencia:asignacion	{printf("\n***REGLA 6 -> Sentencia:\n");}
 		 
 ;
 
-asignacion: ID OPE_ASIG expresion PUNTO_COMA	{printf("\n***REGLA 12 -> Asignacion:\n");}
+asignacion: lista_asig OPE_ASIG expresion PUNTO_COMA	{printf("\n***REGLA 11 -> Asignacion:\n");}
 												{printf("\t\t\tID OPE_ASIG Expresion\n");}
+
+lista_asig: lista_asig OPE_ASIG ID				{printf("\n***REGLA 12 -> Lista_asig:\n");}
+												{printf("\t\t\tlista_asig OPE_ASIG ID\n");}
+			| ID								{printf("\n***REGLA 13 -> Lista_asig:\n");}
+												{printf("\t\t\ID\n");}
+			
 ;
 
-lista_id: ID DOS_PUNTOS tipo_dato {printf("\n***REGLA 13 -> Lista_Id:\n");}
+lista_id: ID DOS_PUNTOS tipo_dato {printf("\n***REGLA 14 -> Lista_Id:\n");}
 			{printf("\t\t\tID\n");}
-         |ID  COMA lista_id		{printf("\n***REGLA 14 -> Lista_Id:\n");}
+         |ID  COMA lista_id		{printf("\n***REGLA 15 -> Lista_Id:\n");}
 								{printf("\t\t\tID COMA Lista_Id\n");}
 ;
 
 
-tipo_dato:INTEGER 				        {printf("\n***REGLA 15 -> Tipo_Dato:\n");}
+tipo_dato:INTEGER 				        {printf("\n***REGLA 16 -> Tipo_Dato:\n");}
 										{printf("\t\t\tInteger\n");}
-          |STRING 						{printf("\n***REGLA 16 -> Tipo_Dato:\n");}
+          |STRING 						{printf("\n***REGLA 17 -> Tipo_Dato:\n");}
 										{printf("\t\t\tString\n");}
-		  |FLOAT						{printf("\n***REGLA 17 -> Tipo_Dato:\n");}
+		  |FLOAT						{printf("\n***REGLA 18 -> Tipo_Dato:\n");}
 										{printf("\t\t\tFloat\n");}
 ;
 
-entrada: READ ID PUNTO_COMA		{printf("\n***REGLA 18 -> Entrada: \n");}
+entrada: READ ID PUNTO_COMA		{printf("\n***REGLA 19 -> Entrada: \n");}
 								{printf("\t\t\t ID\n");}
 ;
 
-salida: WRITE CTE_STR PUNTO_COMA	{printf("\n***REGLA 19 -> Salida:\n");}
+salida: WRITE CTE_STR PUNTO_COMA	{printf("\n***REGLA 20 -> Salida:\n");}
 								{printf("\t\t\t CTE_STR\n");}
-       |WRITE ID PUNTO_COMA     {printf("\n***REGLA 20 -> Salida:\n");}
+       |WRITE ID PUNTO_COMA     {printf("\n***REGLA 21 -> Salida:\n");}
 								{printf("\t\t\tID\n");}
 ;
 
@@ -208,7 +214,15 @@ factor: ID 									{printf("\n***REGLA 44 -> Factor:\n");}
 											{printf("\t\t\t CTE_STR\n");}
 ;
 
-
+lista_io: lista_io entrada					{printf("\n***REGLA 50 -> Lista_io:\n");}
+											{printf("\t\t\t Lista_io -> Lista_io Entrada\n");}
+		|lista_io salida 					{printf("\n***REGLA 51 -> Lista_io:\n");}
+											{printf("\t\t\t Lista_io -> Lista_io Salida\n");}
+		|entrada 							{printf("\n***REGLA 52 -> Lista_io:\n");}
+											{printf("\t\t\t Lista_io -> Entrada\n");}
+		|salida 							{printf("\n***REGLA 53 -> Lista_io:\n");}
+											{printf("\t\t\t Lista_io -> Salida\n");}
+;
 
 
 %%
