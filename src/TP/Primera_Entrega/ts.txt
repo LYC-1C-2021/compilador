@@ -1,5 +1,21 @@
 lexema                 Tipo           Valor                       Longitud
 a1                     FLOAT                                      
-a2                                                                
-a3                                                                
+a2                     STRING                                     
+a3                     FLOAT                                      
 b1                                                                
+variable1                                                         
+p1                                                                
+p2                                                                
+p3                                                                
+_99999.99                             99999.99                    
+_99.                                  99.                         
+_.9999                                .9999                       
+_fd@ffddf_v %                         fd@ffddf_v %              12
+_fsdf dbh hgh  g                      fsdf dbh hgh  g           15
+a                                                                 
+_30                                   30                          
+b                                                                 
+_correcto                             correcto                   8
+_ewr                                  ewr                        3
+base                                                              
+var1                                                              

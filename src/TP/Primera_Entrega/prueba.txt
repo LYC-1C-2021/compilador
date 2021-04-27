@@ -1,28 +1,31 @@
 DECVAR
 a1,a2,a3, b1 : FLOAT
 variable1 : STRING
-p1, p2, p3 : INTEGER
+p1, p2, p3 : FLOAT
 ENDDEC
 
 a1 = 99999.99;
 a2 = 99.;
 a3 = .9999;
 
-variable1 = “@sdADaSjfla%dfg”;
-variable1 = “asldk fh sjf”;
+variable1="fd@ffddf_v %";
+variable1="fsdf dbh hgh  g";
 
--/ Realizo una selección /-
+-/ Realizo una seleccion /-
+
 IF (a <= 30)
-	b = ”correcto”; -/ asignación string /-
+{
+	b = "correcto"; -/ asignacion string /-
+}
 ELSE
-	a1:=a2;
-	
-	
-WRITE “ewr”; -/ donde “ewr” debe ser una cte string /-
-READ base; -/ donde base es una variable /-
-WRITE var1; -/ donde var1 es una vble numérica definida previamente /-
+{
+	a1 = a2;
+}	
+WRITE "ewr"; -/ debe ser una cte string /-	
+READ base;  -/ donde base es una variable /-
+WRITE var1; -/donde var1 es una variable numerica definida previamente /-
 
 
+-/ Asi son los comentarios en el primer cuat de LyC -/ comentario /- /-
 
--/ Así son los comentarios en el 2°Cuat de LyC -/ Comentario /- /-
 

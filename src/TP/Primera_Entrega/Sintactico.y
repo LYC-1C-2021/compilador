@@ -62,15 +62,26 @@ void guardarTS_Archivo();
 %token PUNTO_COMA
 %token L_A
 %token L_C
+%token MOV
+%token DIV
 
 %%
 programa:
-		 declaracion inicio | declaracion {printf("\n---------------------------\n");}
-										  {printf("\n****COMPILACION EXITOSA****\n");}
-										  {printf("\n---------------------------\n");}
+		 declaracion inicio{printf("\n---------------------------\n");}
+															{printf("\n****COMPILACION EXITOSA****\n");}
+															{printf("\n---------------------------\n");} 
+		 | declaracion {printf("\n---------------------------\n");}
+															{printf("\n****COMPILACION EXITOSA****\n");}
+															{printf("\n---------------------------\n");}
+		 | entrada {printf("\n---------------------------\n");}
+															{printf("\n****COMPILACION EXITOSA****\n");}
+															{printf("\n---------------------------\n");}
+		| salida {printf("\n---------------------------\n");}
+															{printf("\n****COMPILACION EXITOSA****\n");}
+															{printf("\n---------------------------\n");}
 ;
 
-declaracion: DECVAR definicion ENDDEC 	{printf("\n***REGLA 1 -> Declaracion:\n");}
+declaracion: DECVAR definicion ENDDEC 	{printf("\n***REGLA 1 -> Declaracion:\n");} 
 										{printf("\t\t\tDeclaracion\n");}
 ;
 
@@ -78,8 +89,9 @@ definicion: lista_id |  lista_id definicion	{printf("\n***REGLA 2 -> Declaracion
 											{printf("\t\t\tDefiniciones\n");}
 ;
 
+
 inicio:	 lista_sentencias 	{printf("\n***REGLA 3 -> Inicio:\n");}
-												{printf("\t\t\tLista_Sentencias\n");}
+							{printf("\t\t\tLista_Sentencias\n");}
 	;
 
 lista_sentencias:sentencia		{printf("\n***REGLA 4 -> Lista_Sentencias:\n");}
@@ -97,8 +109,7 @@ sentencia:asignacion	{printf("\n***REGLA 6 -> Sentencia:\n");}
 						{printf("\t\t\tEntrada\n");}
 		  |salida       {printf("\n***REGLA 10 -> Sentencia:\n");}
 						{printf("\t\t\tSalida\n");}
-		  |constante    {printf("\n***REGLA 11 -> Sentencia:\n");}
-						{printf("\t\t\tConstante\n");}
+		 
 ;
 
 asignacion: ID OPE_ASIG expresion PUNTO_COMA	{printf("\n***REGLA 12 -> Asignacion:\n");}
@@ -169,11 +180,14 @@ iteracion:WHILE condicion L_A lista_sentencias L_C   	{printf("\n***REGLA 36 -> 
 
 expresion: termino 								{printf("\n***REGLA 37 -> Expresion:\n"); }
 												{printf("\t\t\t Termino\n");}
-          |expresion OPE_SUM termino			{printf("\n***REGLA 38 -> Expresion:\n"); }
+			|expresion OPE_SUM termino			{printf("\n***REGLA 38 -> Expresion:\n"); }
 												{printf("\t\t\t Expresion OPE_SUM Termino\n");}
-		  |expresion OPE_RES termino 			{printf("\n***REGLA 39 -> EXPRESION:\n");}
+			|expresion OPE_RES termino 			{printf("\n***REGLA 39 -> EXPRESION:\n");}
 												{printf("\t\t\t Expresion OPE_RES Termino\n");}
-
+			|expresion MOD termino 				{printf("\n***REGLA 48 -> EXPRESION:\n");}
+												{printf("\t\t\t Expresion MOD Termino\n");}
+			|expresion DIV termino 				{printf("\n***REGLA 49 -> EXPRESION:\n");}
+												{printf("\t\t\t Expresion DIV Termino\n");}
 ;
 termino:factor 								{printf("\n***REGLA 40 -> Termino:\n");}
 											{printf("\t\t\t Factor\n");}
@@ -194,13 +208,7 @@ factor: ID 									{printf("\n***REGLA 44 -> Factor:\n");}
 											{printf("\t\t\t CTE_STR\n");}
 ;
 
-constante: CONST ID OPE_ASIG CTE_INT PUNTO_COMA		{printf("\n***REGLA 48 -> Constante:\n");}
-													{printf("\t\t\t CTE_INT\n");}
-		   |CONST ID OPE_ASIG CTE_REAL PUNTO_COMA	{printf("\n***REGLA 49 -> Constante:\n");}
-													{printf("\t\t\t CTE_REAL\n");}
-		   |CONST ID OPE_ASIG CTE_STR PUNTO_COMA	{printf("\n***REGLA  50-> Constante:\n");}
-													{printf("\t\t\t CTE_STR\n");}
-;
+
 
 
 %%
