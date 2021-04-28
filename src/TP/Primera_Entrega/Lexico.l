@@ -70,7 +70,7 @@ NOT			"NOT"|"not"|"Not"
 WRITE 		"WRITE"|"write"|"Write"
 READ 		"READ"|"read"|"Read"
 MOD			"MOD"|"mod"|"Mod"|"%"
-DIV			"DIV"|"div"|"Div"|"/"
+DIV			"DIV"|"div"|"Div"
 
 %%
 
