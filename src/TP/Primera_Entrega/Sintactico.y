@@ -114,11 +114,12 @@ sentencia:asignacion	{printf("\n***REGLA 6 -> Sentencia:\n");}
 
 asignacion: lista_asig OPE_ASIG expresion PUNTO_COMA	{printf("\n***REGLA 11 -> Asignacion:\n");}
 												{printf("\t\t\tID OPE_ASIG Expresion\n");}
+;
 
 lista_asig: lista_asig OPE_ASIG ID				{printf("\n***REGLA 12 -> Lista_asig:\n");}
 												{printf("\t\t\tlista_asig OPE_ASIG ID\n");}
 			| ID								{printf("\n***REGLA 13 -> Lista_asig:\n");}
-												{printf("\t\t\ID\n");}
+												{printf("\t\t\tID\n");}
 			
 ;
 
