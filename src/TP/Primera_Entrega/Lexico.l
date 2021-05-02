@@ -47,9 +47,9 @@ CTE_INT       {DIGITO}+
 CTE_REAL		{DIGITO}+"."{DIGITO}+|{DIGITO}*"."{DIGITO}+|{DIGITO}+"."{DIGITO}*
 COMILLAS	   	"\""
 ESPACIO			" "
-CTE_STR         {COMILLAS}({LETRA}|{DIGITO}|{ESPACIO}|_|@|%)*{COMILLAS}    
-COMENT_SIMPLE	"-/"({LETRA}|{DIGITO}|_|{ESPACIO}|":"|"="|"."|"+"|"("|")"|"["|"]"|","|"@"|" "|"%"|";")*"/-"
-COMENT_DOBLE	"-/"({LETRA}|{DIGITO}|_|{ESPACIO}|":"|"="|"."|"+"|"("|")"|"["|"]"|","|"@"|" "|"%"|";"|{COMENT_SIMPLE})*"/-"
+CTE_STR         {COMILLAS}({LETRA}|{DIGITO}|{ESPACIO}|_|@|%)*{COMILLAS}
+COMENT_SIMPLE	"-/"({LETRA}|{DIGITO}|_|{ESPACIO}|":"|"="|"."|"+"|"("|")"|"["|"]"|","|"@"|" "|"%"|";"|["])*"/-"
+COMENT_DOBLE	"-/"({LETRA}|{DIGITO}|_|{ESPACIO}|":"|"="|"."|"+"|"("|")"|"["|"]"|","|"@"|" "|"%"|";"|["]|{COMENT_SIMPLE})*"/-"
 
 
 FLOAT			"FLOAT"|"float"|"Float"

@@ -45,18 +45,18 @@ WHILE(p1<b1)
 
 	a2=b1;
 	-/ Entrada _ Salida /-
-	WRITE "ewr"; -/ debe ser una cte string /-	
+	WRITE "ewr"; -/ debe ser una cte string /-
 	READ base;  -/ donde base es una variable /-
 	WRITE var1; -/donde var1 es una variable numerica definida previamente /-
-}	
+}
 
--/ Prueba cotas ctes integer /-  
+-/ Prueba cotas ctes integer /-
 
 -/ b4 = 70046444600; /-
 
 -/ Prueba cotas ctes float  /-
 
--/ a1 = 3515151511515.54450; /-
+-/ a1 = 108310167974186776.000000; /-
 
 -/ Prueba cotas ctes String   /-
 
