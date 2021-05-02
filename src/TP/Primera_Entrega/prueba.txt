@@ -1,17 +1,28 @@
+-/ Prueba Declaraciones /-
 DECVAR
 a1,a2,a3, b1 : FLOAT
 variable1 : STRING
 p1, p2, p3 : FLOAT
+b4,b5 : INTEGER
 ENDDEC
+
+
+-/ Prueba Ctes numericas y Asignaciones /-
 
 a1 = 99999.99;
 a2 = 99.;
 a3 = .9999;
 
+-/ Prueba Asignacion multiple /-
+
+p1=p2=p3=2*8+8/3;
+
+-/ Prueba Ctes String /-
+
 variable1="fd@ffddf_v %";
 variable1="fsdf dbh hgh  g";
 
--/ Realizo una seleccion /-
+-/ Prueba seleccion /-
 
 IF (a <= 30)
 {
@@ -20,12 +31,38 @@ IF (a <= 30)
 ELSE
 {
 	a1 = a2;
-}	
-WRITE "ewr"; -/ debe ser una cte string /-	
-READ base;  -/ donde base es una variable /-
-WRITE var1; -/donde var1 es una variable numerica definida previamente /-
+}
 
+-/ Prueba MOD y DIV /-
+
+b4=5*24-96 MOD( a1 DIV a3);
+
+
+-/ Prueba Iteracion /-
+
+WHILE(p1<b1)
+{
+
+	a2=b1;
+	-/ Entrada _ Salida /-
+	WRITE "ewr"; -/ debe ser una cte string /-	
+	READ base;  -/ donde base es una variable /-
+	WRITE var1; -/donde var1 es una variable numerica definida previamente /-
+}	
+
+-/ Prueba cotas ctes integer /-  
+
+-/ b4 = 70046444600; /-
+
+-/ Prueba cotas ctes float  /-
+
+-/ a1 = 3515151511515.54450; /-
+
+-/ Prueba cotas ctes String   /-
+
+-/ variable1 = "snfdggdhfhfjhjhvjhvjhvjvjhvjhvjhvjvjhvjhvjh"; /-
+
+
+-/ Prueba comentario 2 niveles /-
 
 -/ Asi son los comentarios en el primer cuat de LyC -/ comentario /- /-
-
-
