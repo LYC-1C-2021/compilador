@@ -19,7 +19,7 @@ p1=p2=p3=2*8+8/3;
 
 -/ Prueba Ctes String /-
 
-variable1="fd@ffddf_v %";
+variable1="fd@ffddfdf_v %";
 variable1="fsdf dbh hgh  g";
 
 -/ Prueba seleccion /-

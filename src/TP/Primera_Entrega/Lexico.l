@@ -8,6 +8,10 @@
 #include <math.h>
 #include "y.tab.h"
 
+#define LIM_REAL 2147483647
+#define LIM_INT 32768
+#define LIM_STR 32			// Incluye las comillas de inicio y fin de cadena
+
 FILE  *yyin;
 int yylval;
 char *yyltext;
@@ -15,6 +19,8 @@ char *yyltext;
 int yyerror();
 int yylex();
 
+void errorCharInvalido();
+int verificarTamanio(int opc);
 void guardarTS_Archivo();
 void guardarLexemas(char *,int);
 void guardarTS(char *);
@@ -71,7 +77,7 @@ WRITE 		"WRITE"|"write"|"Write"
 READ 		"READ"|"read"|"Read"
 MOD			"MOD"|"mod"|"Mod"|"%"
 DIV			"DIV"|"div"|"Div"
-
+ANY				.
 %%
 
 "DECVAR"		{ return DECVAR; }
@@ -111,52 +117,60 @@ DIV			"DIV"|"div"|"Div"
 
 
 {CTE_STR}		{
-                    int longitud=strlen(yytext);
-					if(longitud <= 30)
+					if(verificarTamanio(CTE_STR) == 0)
 					{
-					 guardarLexemas(yytext,1);
-                     return CTE_STR;
-					 }
-					else{
 						printf("-------------ERROR-------------\n");
 						printf("Cte string fuera de rango.\n");
 						system ("Pause");
 						exit(1);
 					}
-			    }
-
-
-{CTE_INT}		{	int num = atoi(yytext);
-
-					if(num >= 0 && num <= 65535){
-
-						 guardarLexemas(yytext,2);
-
-						return CTE_INT;
+					else
+					{
+						guardarLexemas(yytext,1);
+						return CTE_STR;					
 					}
-					else	{
+				}
+
+
+{CTE_INT}		{	
+					if(verificarTamanio(CTE_INT) == 0)
+					{
 						printf("-------------ERROR-------------\n");
 						printf("Integer fuera de rango.\n");
 						system ("Pause");
 						exit(1);
+					
 					}
+					else
+					{
+						guardarLexemas(yytext,2);
+						return CTE_INT;
+					}
+
 				}
 
-{CTE_REAL}	{	double num = atof(yytext);
-					double cotaMayor = (3.4)*(exp(38));
 
-					if(num >= 0 && num <= cotaMayor){
-					 guardarLexemas(yytext,3);
-
-						return CTE_REAL;
-					}
-					else{
+{CTE_REAL}	{	
+				if(verificarTamanio(CTE_REAL) == 0)
+					{
 						printf("-------------ERROR-------------\n");
 						printf("Real fuera de rango.\n");
-				 		system ("Pause");
-						exit(2);
+						system ("Pause");
+						exit(1);
+					
 					}
+					else
+					{
+						guardarLexemas(yytext,3);
+
+						return CTE_REAL;
+					
+					}
+
+
 				}
+
+
 
 {ID}     	{guardarLexemas(yytext,0);return ID; }
 
@@ -181,7 +195,7 @@ DIV			"DIV"|"div"|"Div"
 "\t"
 " "
 "\r\n"
-
+{ANY}			{ errorCharInvalido();}
 
 %%
 
@@ -296,4 +310,30 @@ void capturaTipo(char * tvar)
 	k++;
 }
 
+int verificarTamanio(int opc){
+	switch(opc){
+		case CTE_INT:
+			if(atoi(yytext) >= -LIM_INT && atoi(yytext) <= LIM_INT-1)
+				return 1;
+			return 0;
+			break;
+		case CTE_STR:
+			if(strlen(yytext) <= LIM_STR) 
+				return 1;
+			return 0;
+			break;
+		case CTE_REAL:
+			if(atof(yytext) >= -LIM_REAL && atof(yytext) <= LIM_REAL-1)
+				return 1;
+			return 0;
+			break;
+	}
+	return 0;
+}
 
+void errorCharInvalido()
+{
+	printf("Caracter invalido ingresado\n");
+	system ("Pause");
+    exit (1);
+}
