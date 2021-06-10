@@ -73,10 +73,7 @@ programa:
 		 | declaracion 		{printf("\n---------------------------\n");}
 							{printf("\n****COMPILACION EXITOSA****\n");}
 							{printf("\n---------------------------\n");}
-		 | lista_io entrada {printf("\n---------------------------\n");}
-							{printf("\n****COMPILACION EXITOSA****\n");}
-							{printf("\n---------------------------\n");}
-		| lista_io salida 	{printf("\n---------------------------\n");}
+		 | lista_io			{printf("\n---------------------------\n");}
 							{printf("\n****COMPILACION EXITOSA****\n");}
 							{printf("\n---------------------------\n");}
 ;
