@@ -32,10 +32,6 @@ void guardarTS_Archivo();
 %token COMA
 %token ID
 %token OPE_ASIG
-%token OPE_SUM
-%token OPE_RES
-%token OPE_MUL
-%token OPE_DIV
 %token CTE_REAL
 %token CTE_STR
 %token CTE_INT
@@ -64,6 +60,12 @@ void guardarTS_Archivo();
 %token L_C
 %token MOD
 %token DIV
+
+
+%left OPE_SUM
+%left OPE_RES
+%left OPE_MUL
+%left OPE_DIV
 
 %%
 programa:
@@ -192,6 +194,8 @@ expresion: termino 								{printf("\n***REGLA 36 -> Expresion:\n"); }
 												{printf("\t\t\t Expresion MOD Termino\n");}
 			|expresion DIV termino 				{printf("\n***REGLA 40 -> EXPRESION:\n");}
 												{printf("\t\t\t Expresion DIV Termino\n");}
+			| OPE_RES expresion %prec OPE_MUL	{printf("\n***REGLA 53 -> EXPRESION:\n");}
+												{printf("\t\t\t OPE_RES Expresion\n");}
 ;
 termino:factor 								{printf("\n***REGLA 41 -> Termino:\n");}
 											{printf("\t\t\t Factor\n");}
