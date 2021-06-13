@@ -66,6 +66,7 @@ void guardarTS_Archivo();
 %left OPE_RES
 %left OPE_MUL
 %left OPE_DIV
+%left UMINUS
 
 %%
 programa:
@@ -113,6 +114,8 @@ sentencia:asignacion	{printf("\n***REGLA 6 -> Sentencia:\n");}
 
 asignacion: lista_asig OPE_ASIG expresion PUNTO_COMA	{printf("\n***REGLA 11 -> Asignacion:\n");}
 														{printf("\t\t\tID OPE_ASIG Expresion\n");}
+					| lista_asig OPE_ASIG CTE_STR PUNTO_COMA	{printf("\n***REGLA 11 -> Asignacion:\n");}
+														{printf("\t\t\tID OPE_ASIG Expresion\n");}
 ;
 
 lista_asig: lista_asig OPE_ASIG ID				{printf("\n***REGLA 12 -> Lista_asig:\n");}
@@ -131,7 +134,7 @@ lista_id: ID DOS_PUNTOS tipo_dato 	{printf("\n***REGLA 14 -> Lista_Id:\n");}
 
 tipo_dato:INTEGER 				        {printf("\n***REGLA 16 -> Tipo_Dato:\n");}
 										{printf("\t\t\tInteger\n");}
-          |STRING 						{printf("\n***REGLA 17 -> Tipo_Dato:\n");}
+      |STRING 						{printf("\n***REGLA 17 -> Tipo_Dato:\n");}
 										{printf("\t\t\tString\n");}
 		  |FLOAT						{printf("\n***REGLA 18 -> Tipo_Dato:\n");}
 										{printf("\t\t\tFloat\n");}
@@ -159,7 +162,7 @@ condicion: P_A condicion_simple P_C			{printf("\n***REGLA 24 -> Condicion:\n");}
 											{printf("\t\t\t Condicion_Simple\n");}
           |P_A condicion_doble P_C 			{printf("\n***REGLA 25 -> Condicion:\n");}
 											{printf("\t\t\t CONDICION_Doble\n");}
-		  |P_A NOT condicion_simple P_C 	{printf("\n***REGLA 26 -> Condicion:\n");}
+		      |P_A NOT condicion_simple P_C 	{printf("\n***REGLA 26 -> Condicion:\n");}
 											{printf("\t\t\t NOT Condicion_Simple\n");}
 ;
 condicion_simple:expresion MAYOR expresion  {printf("\n***REGLA 27 -> Condicion_Simple:\n");}
@@ -194,26 +197,24 @@ expresion: termino 								{printf("\n***REGLA 36 -> Expresion:\n"); }
 												{printf("\t\t\t Expresion MOD Termino\n");}
 			|expresion DIV termino 				{printf("\n***REGLA 40 -> EXPRESION:\n");}
 												{printf("\t\t\t Expresion DIV Termino\n");}
-			| OPE_RES expresion %prec OPE_MUL	{printf("\n***REGLA 53 -> EXPRESION:\n");}
-												{printf("\t\t\t OPE_RES Expresion\n");}
 ;
-termino:factor 								{printf("\n***REGLA 41 -> Termino:\n");}
+termino:factor        {printf("\n***REGLA 41 -> Termino:\n");}
 											{printf("\t\t\t Factor\n");}
-	   |P_A expresion P_C				    {printf("\n***REGLA 42 -> Termino:\n");}
-											{printf("\t\t\t P_A expresion P_C\n");}
-       |termino OPE_MUL factor 				{printf("\n***REGLA 43 -> Termino:\n");}
+      |termino OPE_MUL factor 				{printf("\n***REGLA 43 -> Termino:\n");}
 											{printf("\t\t\t Termino OPE_MUL Factor\n");}
 	   |termino OPE_DIV factor 				{printf("\n***REGLA 44 -> Termino:\n");}
 											{printf("\t\t\t Termino OPE_DIV Factor\n");}
 ;
 factor: ID 									{printf("\n***REGLA 45 -> Factor:\n");}
 											{printf("\t\t\t ID\n");}
-       |CTE_INT 							{printf("\n***REGLA 46 -> Factor:\n");}
+			|CTE_INT 							{printf("\n***REGLA 46 -> Factor:\n");}
 											{printf("\t\t\t CTE_INT\n");}
-	   |CTE_REAL 							{printf("***REGLA 47 -> Factor:\n");}
+			|CTE_REAL 							{printf("***REGLA 47 -> Factor:\n");}
 											{printf("\t\t\t CTE_REAL\n");}
-	   |CTE_STR  							{printf("\n***REGLA 48 -> Factor:\n");}
-											{printf("\t\t\t CTE_STR\n");}
+			|P_A expresion P_C				    {printf("\n***REGLA 42 -> Termino:\n");}
+											{printf("\t\t\t P_A expresion P_C\n");}
+			|OPE_RES factor %prec OPE_MUL	{printf("\n***REGLA 53 -> EXPRESION:\n");}
+									{printf("\t\t\t OPE_RES Expresion\n");}
 ;
 
 lista_io: lista_io entrada					{printf("\n***REGLA 49 -> Lista_io:\n");}
