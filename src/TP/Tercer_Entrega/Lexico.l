@@ -1,7 +1,9 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>
+#if defined(_WIN32)
+	#include <conio.h>
+#endif
 #include <string.h>
 #include <math.h>
 #include "y.tab.h"
@@ -230,7 +232,7 @@ void guardarLexemas(char *nombre,int val)
     if(val==1)
 	{
 	    char *s=nombre;
-		*s++;//adelanto el puntero para que no tome la 1eras comillas
+		s++;//adelanto el puntero para que no tome la 1eras comillas
 		int n=strlen(nombre)-2;//le resto 2 para que no copie las comillas (iniciales y finales)
 		strncpy(nombre,s,n);
 		while(n > 1)//llevo el puntero hasta la posicion que debe finalizar el string 
@@ -248,14 +250,14 @@ void guardarLexemas(char *nombre,int val)
 	   char aux1[10];
 	   strcpy(aux,"cte");
 	   p++;
-	   itoa(p,aux1,10);
+     sprintf(aux1,"%d",p);
 	   strcat(aux,aux1);
 	   
 	   strcpy(ts[i].nombre,"_");
        strcat(ts[i].nombre,aux);
 	   
 	   strcpy(ts[i].valor,nombre);
-	   itoa(strlen(nombre),ts[i].longitud,10);	
+     sprintf(ts[i].longitud,"%lu",strlen(nombre));
 	  
         i++;//incremento para conocer la cantidad de id que hay en la ctes				   
       }
@@ -271,7 +273,7 @@ void guardarLexemas(char *nombre,int val)
 	   char aux1[10];
 	   strcpy(aux,"cte");
 	   p++;
-	   itoa(p,aux1,10);
+     sprintf(aux1,"%d",p);
 	   strcat(aux,aux1);
 	   
 	   strcpy(ts[i].nombre,"_");
@@ -293,7 +295,7 @@ void guardarLexemas(char *nombre,int val)
 	   char aux1[10];
 	   strcpy(aux,"cte");
 	   p++;
-	   itoa(p,aux1,10);
+     sprintf(aux1,"%d",p);
 	   strcat(aux,aux1);
 	  
 	   strcpy(ts[i].nombre,"_");
@@ -427,11 +429,11 @@ int tipo_dato(char *exp,char *ter)//Modificada
 	printf("tipo %s es: %s\n",exp, ts[index1].tipoDato);
 	printf("tipo %s es: %s\n", ter, ts[index2].tipoDato);    
 	
-	if(strcmp(ts[index1].tipoDato,"INTEGER")==0 && strcmp(ts[index2].tipoDato,"CTE_INT")==0 ||
-	strcmp(ts[index1].tipoDato,"FLOAT")==0 && strcmp(ts[index2].tipoDato,"CTE_REAL")==0 ||
-    strcmp(ts[index1].tipoDato,"STRING")==0 && strcmp(ts[index2].tipoDato,"CTE_STR")==0 ||
-	strcmp(ts[index1].tipoDato,"INTEGER")==0 && strcmp(ts[index2].tipoDato,"CTE_INT")==0 ||
-	strcmp(ts[index1].tipoDato,"FLOAT")==0 && strcmp(ts[index2].tipoDato,"CTE_REAL")==0)
+	if((strcmp(ts[index1].tipoDato,"INTEGER")==0 && strcmp(ts[index2].tipoDato,"CTE_INT")==0) ||
+    (strcmp(ts[index1].tipoDato,"FLOAT")==0 && strcmp(ts[index2].tipoDato,"CTE_REAL")==0) ||
+    (strcmp(ts[index1].tipoDato,"STRING")==0 && strcmp(ts[index2].tipoDato,"CTE_STR")==0) ||
+    (strcmp(ts[index1].tipoDato,"INTEGER")==0 && strcmp(ts[index2].tipoDato,"CTE_INT")==0) ||
+    (strcmp(ts[index1].tipoDato,"FLOAT")==0 && strcmp(ts[index2].tipoDato,"CTE_REAL")==0))
 	{ 
        return 0;
 	}else
@@ -461,8 +463,8 @@ int tipos_iguales(char *id,char *exp)
 	//printf("tipo %s es: %s\n",id, ts[index].tipoDato);
 	//printf("tipo %s es: %s\n", exp, ts[index3].tipoDato);
 
-	if(strcmp(ts[index].tipoDato,"INTEGER")==0 && strcmp(ts[index3].tipoDato,"INTEGER")==0 ||
-	strcmp(ts[index].tipoDato,"FLOAT")==0 && strcmp(ts[index3].tipoDato,"FLOAT")==0 )
+	if((strcmp(ts[index].tipoDato,"INTEGER")==0 && strcmp(ts[index3].tipoDato,"INTEGER")==0) ||
+	  (strcmp(ts[index].tipoDato,"FLOAT")==0 && strcmp(ts[index3].tipoDato,"FLOAT")==0))
 	{ 
        return 0;
 	}
@@ -478,10 +480,10 @@ int tipos_iguales(char *id,char *exp)
 	}
 	printf("tipo %s es: %s\n",id, ts[index].tipoDato);
     printf("tipo %s es: %s\n", exp, ts[index2].tipoDato);
-	if(strcmp(ts[index].tipoDato,"INTEGER")==0 && strcmp(ts[index2].tipoDato,"CTE_INT")==0 ||
-	strcmp(ts[index].tipoDato,"FLOAT")==0 && strcmp(ts[index2].tipoDato,"CTE_REAL")==0 ||
-	strcmp(ts[index].tipoDato,"FLOAT")==0 && strcmp(ts[index2].tipoDato,"CTE_INT")==0 ||
-	strcmp(ts[index].tipoDato,"STRING")==0 && strcmp(ts[index2].tipoDato,"CTE_STR")==0 )
+	if((strcmp(ts[index].tipoDato,"INTEGER")==0 && strcmp(ts[index2].tipoDato,"CTE_INT")==0) ||
+    (strcmp(ts[index].tipoDato,"FLOAT")==0 && strcmp(ts[index2].tipoDato,"CTE_REAL")==0) ||
+    (strcmp(ts[index].tipoDato,"FLOAT")==0 && strcmp(ts[index2].tipoDato,"CTE_INT")==0) ||
+    (strcmp(ts[index].tipoDato,"STRING")==0 && strcmp(ts[index2].tipoDato,"CTE_STR")==0))
 	{ 
        return 0;
 	}else

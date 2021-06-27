@@ -35,6 +35,7 @@ WHILE(p1<b1)
 }
 
 b4 = 21 % 2;
+b4 = 21 DIV 2;
 
 -/ Prueba seleccion /-
 

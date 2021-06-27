@@ -2,11 +2,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <conio.h>
+#if defined(_WIN32)
+	#include <conio.h>
+#endif
 #include <errno.h>
 #include "y.tab.h"
 #define RENGLONES_IMPRESION_ARBOL 30
 #define CARACTERES_RENGLON_ARBOL 400
+
+#if !defined(_WIN32)
+	int yyerror();
+	int yylex();
+#endif
 
 int yystopparser=0;
 char * yytext;               
@@ -83,12 +90,11 @@ void insertar_en_pila_de_colas(t_pila_de_colas ** , t_cola *);
 t_cola * sacar_de_pila_de_colas(t_pila_de_colas **);
 
 void copiar_sin_finalizador(char * dest,char * orig);
-int print_t(t_nodo_arbol *tree);
+void print_t(t_nodo_arbol *tree);
 int _print_t(t_nodo_arbol *tree, int is_left, int offset, int depth, char * s, int max);
 
 void crearAssembler(t_nodo_arbol *);
 void recorrer_asm(t_nodo_arbol *, int);
-void recorrer_asm2(t_nodo_arbol *, int);
 
 void guardarTabladeSimbolosEnUnArchivo();
 void guardarLexemas(char *nombre,int val);
@@ -220,30 +226,19 @@ int *entero;
 %left UMINUS
 
 %%
-/*start:	programa	{arbol_ejecucion->p_nodo = obtener_raiz(nodo_sentencias);
-					crearAssembler(arbol_ejecucion->p_nodo);}
-*/
-programa: declaracion inicio	{
-									arbol_ejecucion->p_nodo = obtener_raiz(nodo_sentencias);
-									crearAssembler(arbol_ejecucion->p_nodo);
-									printf("\n---------------------------\n");
-									printf("\n****COMPILACION EXITOSA****\n");
-									printf("\n---------------------------\n");
-								} 
-		 | declaracion 			{
-									//arbol_ejecucion->p_nodo = obtener_raiz(nodo_sentencias);
-									//crearAssembler(arbol_ejecucion->p_nodo);
-									printf("\n---------------------------\n");
-									printf("\n****COMPILACION EXITOSA****\n");
-									printf("\n---------------------------\n");
-								}
-		 | lista_io				{
-			 						arbol_ejecucion->p_nodo = obtener_raiz(nodo_entsal);
-									crearAssembler(arbol_ejecucion->p_nodo);
-									printf("\n---------------------------\n");
-									printf("\n****COMPILACION EXITOSA****\n");
-									printf("\n---------------------------\n");
-								}
+start:	programa	{
+	printf("\n---------------------------\n");
+	printf("\n****COMPILACION EXITOSA****\n");
+	printf("\n---------------------------\n");
+	
+	arbol_ejecucion->p_nodo = obtener_raiz(nodo_sentencias);
+	crearAssembler(arbol_ejecucion->p_nodo);
+	
+}
+
+programa: declaracion inicio	{arbol_ejecucion->p_nodo = obtener_raiz(nodo_sentencias);} 
+		 | declaracion 						{arbol_ejecucion->p_nodo = obtener_raiz(nodo_sentencias);}
+		 | lista_io								{arbol_ejecucion->p_nodo = obtener_raiz(nodo_entsal);}
 ;
   
 declaracion: DECVAR definicion ENDDEC
@@ -435,18 +430,18 @@ entsal: WRITE CTE_STR PUNTO_COMA
 decision:IF condicion L_A lista_sentencias L_C 
 		{
 			nodo_sentencias_then = obtener_raiz(nodo_sentencias);
-		
-  			printf("\n***REGLA 21 -> Condicion:\n");
+
+  		printf("\n***REGLA 21 -> Condicion:\n");
 			printf("\t\t\t IF Condicion L_A Lista_Sentencias L_C\n");
-  			t_info_sentencias * p_info = sacar_de_pila(&pila_condiciones);
+  		t_info_sentencias * p_info = sacar_de_pila(&pila_condiciones);
 			//le pongo null porque ahi iria el ELSE y no hay
 			nodo_then = crear_nodo_arbol(crear_info("THEN"),nodo_sentencias_then,NULL);
 			nodo_condicional = crear_nodo_arbol(crear_info("IF"),p_info->a,nodo_then);
 			insertar_en_pila(&pila_condicional,crear_info_sentencias(nodo_condicional));
 		}
-       |IF condicion L_A lista_sentencias L_C 
-	   	{
-		   	nodo_sentencias_then = obtener_raiz(nodo_sentencias);
+		|IF condicion L_A lista_sentencias L_C 
+		{
+			nodo_sentencias_then = obtener_raiz(nodo_sentencias);
 		} 
 		ELSE L_A lista_sentencias L_C 
 		{
@@ -454,8 +449,8 @@ decision:IF condicion L_A lista_sentencias L_C
 			printf("\n***REGLA 22 -> Condicion:\n");
 			printf("\t\t\t IF Condicion L_A Lista_Sentencias L_C ELSE L_A Lista_Sentencias L_C\n");
 			t_info_sentencias * p_info = sacar_de_pila(&pila_condiciones);
-	        nodo_then = crear_nodo_arbol(crear_info("<V.F>"),nodo_sentencias_then,nodo_sentencias_else);
-	        nodo_condicional = crear_nodo_arbol(crear_info("IF"),p_info->a,nodo_then);
+			nodo_then = crear_nodo_arbol(crear_info("<V.F>"),nodo_sentencias_then,nodo_sentencias_else);
+			nodo_condicional = crear_nodo_arbol(crear_info("IF"),p_info->a,nodo_then);
 			insertar_en_pila(&pila_condicional,crear_info_sentencias(nodo_condicional));
 		}		 
 ;
@@ -553,7 +548,7 @@ condicion_simple:expresion MAYOR expresion
 					{
 						printf("Error las variables son de diferente tipo\n");
 		          		exit(1);
-					}/*
+					}*/
 				    t_info_sentencias * p_info1 = sacar_de_pila(&pila_expresiones);
 	                t_info_sentencias * p_info2 = sacar_de_pila(&pila_expresiones);
 	                nodo_comparacion = crear_nodo_arbol(crear_info(">="),p_info1->a,p_info2->a);
@@ -681,8 +676,8 @@ expresion: termino
 		    }								   
 		  |expresion DIV termino 
 		  	{
-		        printf("\n***REGLA 38 -> Expresion:\n"); 
-				printf("\t\t\t Expresion OPE_DIV Termino\n");
+		    printf("\n***REGLA 38 -> Expresion:\n"); 
+				printf("\t\t\t Expresion DIV Termino\n");
 				/*if(tipos_iguales($1,$3)==1) 
 				{
 					printf("Error las variables son de diferente tipo\n");
@@ -691,24 +686,19 @@ expresion: termino
 				strcpy(auxiliarexp,$1);
 				strcpy(auxiliarter,$3);
 		                                       
-			    t_info_sentencias * p_nodo_expresion = sacar_de_pila(&pila_expresiones);
-											 
-	            t_info_sentencias * p_nodo_termino =  sacar_de_pila(&pila_terminos);
-												
-				nodo_div = crear_nodo_arbol(crear_info("/"),p_nodo_expresion->a,p_nodo_termino->a);
-											  
-	            nodo_mult = crear_nodo_arbol(crear_info("*"),p_nodo_expresion->a,nodo_div);
-				nodo_expresion =  crear_nodo_arbol(crear_info("-"),p_nodo_termino->a,nodo_mult);
-											   
-	            insertar_en_pila(&pila_expresiones,crear_info_sentencias(nodo_expresion));
-                insertar_en_cola(&cola_expresiones,crear_info_sentencias(nodo_expresion));
-	                                            
+				t_info_sentencias * p_nodo_expresion = sacar_de_pila(&pila_expresiones);
+								
+				t_info_sentencias * p_nodo_termino =  sacar_de_pila(&pila_terminos);
+								
+				nodo_expresion = crear_nodo_arbol(crear_info("DIV"),p_nodo_expresion->a,p_nodo_termino->a);																	
+				insertar_en_pila(&pila_expresiones,crear_info_sentencias(nodo_expresion));
+				insertar_en_cola(&cola_expresiones,crear_info_sentencias(nodo_expresion));	                                            
 				free(p_nodo_expresion);
-	            free(p_nodo_termino);									
+	      free(p_nodo_termino);									
 			}
 			|expresion MOD termino
 			{
-		        printf("\n***REGLA 39 -> Expresion:\n"); 
+		    printf("\n***REGLA 39 -> Expresion:\n"); 
 				printf("\t\t\t Expresion MOD Termino\n");
 				/*if(tipos_iguales($1,$3)==1) 
 				{
@@ -717,22 +707,14 @@ expresion: termino
 				}*/												
 				strcpy(auxiliarexp,$1);
 				strcpy(auxiliarter,$3);
-		                                       
-			    t_info_sentencias * p_nodo_expresion = sacar_de_pila(&pila_expresiones);
-											 
-	            t_info_sentencias * p_nodo_termino =  sacar_de_pila(&pila_terminos);
-												
-				nodo_mod = crear_nodo_arbol(crear_info("%"),p_nodo_expresion->a,p_nodo_termino->a);
-											  
-	            nodo_mult = crear_nodo_arbol(crear_info("*"),p_nodo_expresion->a,nodo_div);
-				nodo_expresion =  crear_nodo_arbol(crear_info("-"),p_nodo_termino->a,nodo_mult);
-											   
-	            insertar_en_pila(&pila_expresiones,crear_info_sentencias(nodo_expresion));
-                insertar_en_cola(&cola_expresiones,crear_info_sentencias(nodo_expresion));
-	                                            
+
+				t_info_sentencias * p_nodo_expresion = sacar_de_pila(&pila_expresiones);
+				t_info_sentencias * p_nodo_termino =  sacar_de_pila(&pila_terminos);
+				nodo_expresion = crear_nodo_arbol(crear_info("MOD"),p_nodo_expresion->a,p_nodo_termino->a);
+				insertar_en_pila(&pila_expresiones,crear_info_sentencias(nodo_expresion));
+				insertar_en_cola(&cola_expresiones,crear_info_sentencias(nodo_expresion));
 				free(p_nodo_expresion);
-	            free(p_nodo_termino);
-												
+				free(p_nodo_termino);												
 			}											
 ;
 
@@ -808,7 +790,7 @@ factor: ID
 	        char cad1[10];
 	        strcpy(cad,"_cte");
 	        n++;
-	        itoa(n,cad1,10);
+					sprintf(cad1,"%d",n);
 	        strcat(cad,cad1);
 					   
 	        nodo_factor =  crear_hoja(crear_info(cad));
@@ -826,8 +808,8 @@ factor: ID
 			char cad[10];
 	        char cad1[10];
 	        strcpy(cad,"_cte");
-	        n++;
-	        itoa(n,cad1,10);
+	        n++;	        
+					sprintf(cad1,"%d",n);
 	        strcat(cad,cad1);
 					   
 	        nodo_factor =  crear_hoja(crear_info(cad));
@@ -845,7 +827,7 @@ factor: ID
 	        char cad1[10];
 	        strcpy(cad,"_cte");
 	        n++;
-	        itoa(n,cad1,10);
+					sprintf(cad1,"%d",n);
 	        strcat(cad,cad1);
 					   
 	        nodo_factor =  crear_hoja(crear_info(cad));
@@ -909,11 +891,8 @@ int yyerror(void)
 
 void crear_arbol(t_arbol ** p_arbol)
 {	
-	if(*p_arbol == NULL) 
-	{
-		*p_arbol = (t_arbol*) malloc(sizeof(t_arbol));
-		(*p_arbol)->p_nodo =NULL;
-	}
+	*p_arbol = (t_arbol*) malloc(sizeof(t_arbol));
+	(*p_arbol)->p_nodo =NULL;
 }
 
 /* Esta funcion crea un t_info a partir de una string, para agregarla
@@ -1011,7 +990,7 @@ int _print_t(t_nodo_arbol *tree, int is_left, int offset, int depth, char * s, i
     return left + width + right;
 }
 
-int print_t(t_nodo_arbol *tree)
+void print_t(t_nodo_arbol *tree)
 {
 	FILE *f = fopen("intermedia.txt", "w+");
 	if (f == NULL)
@@ -1200,12 +1179,13 @@ void crearAssembler(t_nodo_arbol *arbol)
 {
     int s;
   //recorrer_en_orden(arbol_ejecucion->p_nodo,&visitar);
-  	a = fopen("Final.asm", "w");
+  a = fopen("Final.asm", "w");
 	if (a == NULL)
 	{
 	    puts("Error abriendo archivo assembler");
 	    exit(1);
 	}
+
 	fprintf(a, "\ninclude macros2.asm\t\t ;incluye macros");
 	fprintf(a, "\ninclude number.asm\t\t ;incluye el asm para impresion de numeros");
 	fprintf(a, "\n.model large");
@@ -1231,15 +1211,15 @@ void crearAssembler(t_nodo_arbol *arbol)
 		}
 		if(!strcmp(ts[s].tipoDato,"Float"))
 		{
-			fprintf(a, "%s  dd  ?\n",ts[s].nombre,ts[s].valor);
+			fprintf(a, "%s  dd  ?\n",ts[s].nombre);
 		}
 		if(!strcmp(ts[s].tipoDato,"String"))
 		{
-			fprintf(a, "%s  db  LEN_LEXEMA DUP(?),'$'\n",ts[s].nombre,ts[s].valor);
+			fprintf(a, "%s  db  LEN_LEXEMA DUP(?),'$'\n",ts[s].nombre);
 		}
 		if(!strcmp(ts[s].tipoDato,"Integer"))
 		{
-			fprintf(a, "%s  dd  ?\n",ts[s].nombre,ts[s].valor);
+			fprintf(a, "%s  dd  ?\n",ts[s].nombre);
 		}
    }
     fprintf(a, "\naux1 dd ?");
@@ -1251,14 +1231,14 @@ void crearAssembler(t_nodo_arbol *arbol)
 	fprintf(a, "\nmov AX,@DATA ;");
 	fprintf(a, "\nmov DS,AX ;");
 	fprintf(a, "\nfinit ;\n");
-    recorrer_asm(arbol, 0);
+  recorrer_asm(arbol, 0);
 	
 	if(ifs>0)
 	{
 		fprintf(a, "\nend_if");
 		char buf[2];
 		sprintf(buf, "%d", ifs);
-		fprintf(a, buf);
+		fprintf(a, "%s", buf);
 		fprintf(a, ":");
 		ifs--;
 		if(ifs==base)
@@ -1275,7 +1255,7 @@ void crearAssembler(t_nodo_arbol *arbol)
 		fprintf(a, "\nend_while");
 		char buf[2];
 		sprintf(buf, "%d", whiles);
-		fprintf(a, buf);
+		fprintf(a, "%s", buf);
 		fprintf(a, ":");
 		whiles--;
 	}
@@ -1292,14 +1272,14 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 	if(n->nodo_izq != NULL)
 		recorrer_asm(n->nodo_izq, usar_aux2);
 
-    if(strcmp(n->info->a,"=")==0)		
+  if(strcmp(n->info->a,"=")==0)		
 	{	
 		if(es_hoja(n->nodo_der))
 		{//Si el nodo derecho es Hoja hace la asignacion 
 			fprintf(a, "\nfld ; asignacion");
-			fprintf(a, n->nodo_der->info->a);
+			fprintf(a, "%s", n->nodo_der->info->a);
 			fprintf(a, "\nfstp ");
-			fprintf(a, n->nodo_izq->info->a);
+			fprintf(a, "%s", n->nodo_izq->info->a);
 		}
 		else if(!es_hoja(n->nodo_der))
 		{
@@ -1309,17 +1289,16 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 			strcat(asig_final, "\nfstp ");
 			strcat(asig_final, n->nodo_izq->info->a);//coloca el resultado en el Resto
 		} 
-	
-	}		
-    else //Si no es una Asignacion , pregunta si es una +
+	}	else //Si no es una Asignacion , pregunta si es una +
+
 	if(strcmp(n->info->a,"+")==0)
 	{
 		if(es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))//si el nodo izq y derecho son hojas , resuelve
 		{
 			fprintf(a, "\nfld ");//apila nodo derecho
-			fprintf(a, n->nodo_der->info->a);
+			fprintf(a, "%s", n->nodo_der->info->a);
 			fprintf(a, "\nfld ");//Apila nodo izquierdo
-			fprintf(a, n->nodo_izq->info->a);
+			fprintf(a, "%s", n->nodo_izq->info->a);
 			fprintf(a, "\nfadd");//Suma
 			fprintf(a, "\nfstp ");//desapila resultado en aux1 o aux2
 			if(!usar_aux2)
@@ -1335,7 +1314,7 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 		else if(!es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))//Si el hijo izquierdo no es hoja y el derecho es hoja
 		{
 			fprintf(a, "\nfld ");
-			fprintf(a, n->nodo_der->info->a);
+			fprintf(a, "%s", n->nodo_der->info->a);
 			fprintf(a, "\nfld ");
 			fprintf(a, "aux1");//El resultado del nodo izquierdo
 			fprintf(a, "\nfadd");
@@ -1366,9 +1345,9 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 		if(es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))
 		{
 			fprintf(a, "\nfld ");
-			fprintf(a, n->nodo_der->info->a);
+			fprintf(a, "%s", n->nodo_der->info->a);
 			fprintf(a, "\nfld ");
-			fprintf(a, n->nodo_izq->info->a);
+			fprintf(a, "%s", n->nodo_izq->info->a);
 			fprintf(a, "\nfsub");
 			fprintf(a, "\nfstp ");
 			fprintf(a, "aux1");
@@ -1376,7 +1355,7 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 		else if(!es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))
 		{
 			fprintf(a, "\nfld ");
-			fprintf(a, n->nodo_der->info->a);
+			fprintf(a, "%s", n->nodo_der->info->a);
 			fprintf(a, "\nfld ");
 			fprintf(a, "aux1");
 			fprintf(a, "\nfsub");
@@ -1400,15 +1379,15 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 		if(es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))
 		{
 			fprintf(a, "\nfld ");
-			fprintf(a, n->nodo_der->info->a);
+			fprintf(a, "%s", n->nodo_der->info->a);
 			fprintf(a, "\nfld ");
-			fprintf(a, n->nodo_izq->info->a);
+			fprintf(a, "%s", n->nodo_izq->info->a);
 			fprintf(a, "\nfmul");
 			fprintf(a, "\nfstp ");
 			if(!usar_aux2)
 			{
 				fprintf(a, "aux1");
-				fprintf(a, sent_final);
+				fprintf(a, "%s", sent_final);
 				strcpy(sent_final,"");
 			} 
 			else
@@ -1419,7 +1398,7 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 		else if(!es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))
 		{
 			fprintf(a, "\nfld ");
-			fprintf(a, n->nodo_der->info->a);
+			fprintf(a, "%s", n->nodo_der->info->a);
 			fprintf(a, "\nfld ");
 			if(!usar_aux2)
 			{
@@ -1446,15 +1425,15 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 			if(es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))
 			{
 				fprintf(a, "\nfld ");
-				fprintf(a, n->nodo_der->info->a);
+				fprintf(a, "%s", n->nodo_der->info->a);
 				fprintf(a, "\nfld ");
-				fprintf(a, n->nodo_izq->info->a);
+				fprintf(a, "%s", n->nodo_izq->info->a);
 				fprintf(a, "\nfdiv");
 				fprintf(a, "\nfstp ");
 				if(!usar_aux2)
 				{
 					fprintf(a, "aux1");
-					fprintf(a, sent_final);
+					fprintf(a, "%s", sent_final);
 					strcpy(sent_final,"");
 				} 
 				else
@@ -1465,7 +1444,7 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 			else if(!es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))
 			{
 				fprintf(a, "\nfld ");
-				fprintf(a, n->nodo_der->info->a);
+				fprintf(a, "%s", n->nodo_der->info->a);
 				fprintf(a, "\nfld ");
 				if(!usar_aux2)
 				{
@@ -1486,8 +1465,101 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 					fprintf(a, "aux2");
 				}
 			}		
+		}
+	else if(strcmp(n->info->a,"DIV")==0)
+		{
+			if(es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))
+			{
+				fprintf(a, "\nfld ");
+				fprintf(a, "%s", n->nodo_der->info->a);
+				fprintf(a, "\nfld ");
+				fprintf(a, "%s", n->nodo_izq->info->a);
+				fprintf(a, "\nfidiv");
+				fprintf(a, "\nfstp ");
+				if(!usar_aux2)
+				{
+					fprintf(a, "aux1");
+					fprintf(a, "%s", sent_final);
+					strcpy(sent_final,"");
+				} 
+				else
+				{
+					fprintf(a, "aux2");
+				}
+			} 
+			else if(!es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))
+			{
+				fprintf(a, "\nfld ");
+				fprintf(a, "%s", n->nodo_der->info->a);
+				fprintf(a, "\nfld ");
+				if(!usar_aux2)
+				{
+					fprintf(a, "aux1");
+				} 
+				else
+				{
+					fprintf(a, "aux2");
+				}
+				fprintf(a, "\nfidiv");
+				fprintf(a, "\nfstp ");
+				if(!usar_aux2)
+				{
+					fprintf(a, "aux1");
+				} 
+				else
+				{
+					fprintf(a, "aux2");
+				}
+			}		
+		} 
+	// Para calcular resto: FPREM = ST(0) <- REPITE(ST(0)-ST(1))		
+	else if(strcmp(n->info->a,"MOD")==0)
+		{
+			if(es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))
+			{
+				fprintf(a, "\nfld ");
+				fprintf(a, "%s", n->nodo_der->info->a);
+				fprintf(a, "\nfld ");
+				fprintf(a, "%s", n->nodo_izq->info->a);
+				fprintf(a, "\nfprem");
+				fprintf(a, "\nfstp ");
+				if(!usar_aux2)
+				{
+					fprintf(a, "aux1");
+					fprintf(a, "%s", sent_final);
+					strcpy(sent_final,"");
+				} 
+				else
+				{
+					fprintf(a, "aux2");
+				}
+			} 
+			else if(!es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))
+			{
+				fprintf(a, "\nfld ");
+				fprintf(a, "%s", n->nodo_der->info->a);
+				fprintf(a, "\nfld ");
+				if(!usar_aux2)
+				{
+					fprintf(a, "aux1");
+				} 
+				else
+				{
+					fprintf(a, "aux2");
+				}
+				fprintf(a, "\fprem");
+				fprintf(a, "\nfstp ");
+				if(!usar_aux2)
+				{
+					fprintf(a, "aux1");
+				} 
+				else
+				{
+					fprintf(a, "aux2");
+				}
+			}		
 		} else
-	
+
 	if(strcmp(n->info->a,"==")==0)
 	{
 		usar_aux2=1;
@@ -1495,10 +1567,10 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
         if(es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))
 		{
 			fprintf(a, "\nfld ");
-			fprintf(a, n->nodo_izq->info->a);
+			fprintf(a, "%s", n->nodo_izq->info->a);
 			fprintf(a, "\nfstp aux1");
 			fprintf(a, "\nfld ");
-			fprintf(a, n->nodo_der->info->a);
+			fprintf(a, "%s", n->nodo_der->info->a);
 			fprintf(a, "\nfstp aux2");	
 		}
 	}
@@ -1509,10 +1581,10 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 			if(es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))
 			{
 				fprintf(a, "\nfld ");
-				fprintf(a, n->nodo_izq->info->a);
+				fprintf(a, "%s", n->nodo_izq->info->a);
 				fprintf(a, "\nfstp aux1");
 				fprintf(a, "\nfld ");
-				fprintf(a, n->nodo_der->info->a);
+				fprintf(a, "%s", n->nodo_der->info->a);
 				fprintf(a, "\nfstp aux2");
 			}
 		} 
@@ -1523,10 +1595,10 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 			if(es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))
 			{
 				fprintf(a, "\nfld ");
-				fprintf(a, n->nodo_izq->info->a);
+				fprintf(a, "%s", n->nodo_izq->info->a);
 				fprintf(a, "\nfstp aux1");
 				fprintf(a, "\nfld ");
-				fprintf(a, n->nodo_der->info->a);
+				fprintf(a, "%s", n->nodo_der->info->a);
 				fprintf(a, "\nfstp aux2");
 			}
 		} 
@@ -1537,10 +1609,10 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 			if(es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))
 			{
 				fprintf(a, "\nfld ");
-				fprintf(a, n->nodo_izq->info->a);
+				fprintf(a, "%s", n->nodo_izq->info->a);
 				fprintf(a, "\nfstp aux1");
 				fprintf(a, "\nfld ");
-				fprintf(a, n->nodo_der->info->a);
+				fprintf(a, "%s", n->nodo_der->info->a);
 				fprintf(a, "\nfstp aux2");
 			}
 		} 
@@ -1551,10 +1623,10 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 			if(es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))
 			{
 				fprintf(a, "\nfld ");
-				fprintf(a, n->nodo_izq->info->a);
+				fprintf(a, "%s", n->nodo_izq->info->a);
 				fprintf(a, "\nfstp aux1");
 				fprintf(a, "\nfld ");
-				fprintf(a, n->nodo_der->info->a);
+				fprintf(a, "%s", n->nodo_der->info->a);
 				fprintf(a, "\nfstp aux2");
 			}
 		} 
@@ -1565,10 +1637,10 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 			if(es_hoja(n->nodo_izq) && es_hoja(n->nodo_der))
 			{
 				fprintf(a, "\nfld ");
-				fprintf(a, n->nodo_izq->info->a);
+				fprintf(a, "%s", n->nodo_izq->info->a);
 				fprintf(a, "\nfstp aux1");
 				fprintf(a, "\nfld ");
-				fprintf(a, n->nodo_der->info->a);
+				fprintf(a, "%s", n->nodo_der->info->a);
 				fprintf(a, "\nfstp aux2");
 			}
 		}
@@ -1584,11 +1656,11 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 				fprintf(a, "\nfstsw ax");
 				fprintf(a, "\nsahf");
 				fprintf(a, "\nffree st(0)");
-				fprintf(a, string_cond);
+				fprintf(a, "%s", string_cond);
 				fprintf(a, "end_if");
 				char buf[2];
 	 			sprintf(buf, "%d", ifs);
-				fprintf(a, buf);
+				fprintf(a, "%s", buf);
 	  		}	
      		else
        		{	
@@ -1600,11 +1672,11 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 				fprintf(a, "\nfwait");
 				fprintf(a, "\nsahf");
 				fprintf(a, "\nffree st(0)");
-				fprintf(a, string_cond);
+				fprintf(a, "%s", string_cond);
 				fprintf(a, "else_if");
 				char buf[2];
 	 			sprintf(buf, "%d", ifs);
-				fprintf(a, buf);
+				fprintf(a, "%s", buf);
 			}
 		}
 		else if(strcmp(n->info->a,"<V.F>")==0)
@@ -1613,9 +1685,9 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 	 		sprintf(buf, "%d", ifs);
 			fprintf(a, "\njmp ");
 			fprintf(a, "end_if");
-			fprintf(a, buf);
+			fprintf(a, "%s", buf);
 			fprintf(a, "\nelse_if");
-			fprintf(a, buf);
+			fprintf(a, "%s", buf);
 			fprintf(a, ":");
 		}
 		else if(strcmp(n->info->a,"WHILE")==0)
@@ -1624,7 +1696,7 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 			fprintf(a, "\nwhile");
 			char buf3[2];
 	 		sprintf(buf3, "%d", whiles);
-			fprintf(a, buf3);
+			fprintf(a, "%s", buf3);
 			fprintf(a, ":");
 			fprintf(a, "\nfld ");
 		    fprintf(a, "aux1");
@@ -1634,11 +1706,11 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 			fprintf(a, "\nfwait");
 			fprintf(a, "\nsahf");
 			fprintf(a, "\nffree st(0)");
-			fprintf(a, string_cond);
+			fprintf(a, "%s", string_cond);
 			fprintf(a, "while");
 			char buf[2];
 	 		sprintf(buf, "%d", whiles);
-			fprintf(a, buf);			
+			fprintf(a, "%s", buf);			
 		} 
 		else if(strcmp(n->info->a,"WRITE")==0 && strcmp(n->padre->info->a, ";")==0)
 		{
@@ -1647,14 +1719,14 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 			if(tipo!=3)
 			{
 				fprintf(a, "\nDisplayFloat ");
-				fprintf(a, n->nodo_der->info->a);
+				fprintf(a, "%s", n->nodo_der->info->a);
 				fprintf(a, " 2");
 				fprintf(a, "\nnewLine 1");
 			} 
 			else
 			{
 				fprintf(a, "\nDisplayString ");
-				fprintf(a, n->nodo_der->info->a);
+				fprintf(a, "%s", n->nodo_der->info->a);
 				fprintf(a, "\nnewLine 1");
 			}
 		}
@@ -1668,18 +1740,18 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 			if(tipo!=3)
 			{
 				fprintf(a, "\nGetFloat ");
-				fprintf(a, n->nodo_der->info->a);
+				fprintf(a, "%s", n->nodo_der->info->a);
 				fprintf(a, "\nnewLine 1");
 			} 
 			else
 			{
 				fprintf(a, "\nGetString ");
-				fprintf(a, n->nodo_der->info->a);
+				fprintf(a, "%s", n->nodo_der->info->a);
 				fprintf(a, "\nnewLine 1");
 			}
 		}	
 
     if(n->nodo_der != NULL)
-	recorrer_asm(n->nodo_der, usar_aux2);	
+			recorrer_asm(n->nodo_der, usar_aux2);	
 }
 
