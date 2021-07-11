@@ -10,7 +10,7 @@ p3                     FLOAT
 b4                     INTEGER                                    
 b5                     INTEGER                                    
 _cte1                  CTE_REAL       1054.23                     
-_cte2                  CTE_INT        5343                        
+_cte2                  CTE_INT        343                         
 _cte3                  CTE_REAL       99999.99                    
 _cte4                  CTE_REAL       99.                         
 _cte5                  CTE_REAL       .9999                       
@@ -18,22 +18,20 @@ _cte6                  CTE_INT        22
 _cte7                  CTE_INT        9                           
 _cte8                  CTE_INT        2                           
 _cte9                  CTE_STR        constante string          16
-_cte10                 CTE_STR        ewr                        3
-_cte11                 CTE_STR        ewr                        3
+_cte10                 CTE_INT        21                          
+_cte11                 CTE_INT        2                           
 _cte12                 CTE_INT        21                          
 _cte13                 CTE_INT        2                           
 _cte14                 CTE_INT        21                          
 _cte15                 CTE_INT        2                           
-_cte16                 CTE_INT        21                          
-_cte17                 CTE_INT        2                           
-_cte18                 CTE_INT        30                          
-_cte19                 CTE_INT        30                          
-_cte20                 CTE_INT        40                          
-_cte21                 CTE_STR        Condicion doble AND       19
-_cte22                 CTE_INT        30                          
-_cte23                 CTE_INT        40                          
-_cte24                 CTE_STR        Condicion doble OR        18
-_cte25                 CTE_STR        str 1                      5
-_cte26                 CTE_STR        str 2                      5
-_cte27                 CTE_STR        str 3                      5
-_cte28                 CTE_STR        str 4                      5
+_cte16                 CTE_INT        30                          
+_cte17                 CTE_INT        30                          
+_cte18                 CTE_INT        40                          
+_cte19                 CTE_STR        Condicion doble AND       19
+_cte20                 CTE_INT        30                          
+_cte21                 CTE_INT        40                          
+_cte22                 CTE_STR        Condicion doble OR        18
+_cte23                 CTE_STR        str 1                      5
+_cte24                 CTE_STR        str 2                      5
+_cte25                 CTE_STR        str 3                      5
+_cte26                 CTE_STR        str 4                      5

@@ -27,6 +27,7 @@ int n=0;
 static int usar_aux2 = 0, ifs=0, whiles=0, base=0;
 static char string_cond[5];
 static int cond=0;
+int cont=0;
 
 typedef struct {
 	char a[30];
@@ -132,6 +133,7 @@ t_nodo_arbol * nodo_entsal;
 t_nodo_arbol * nodo_iteracion;
 t_nodo_arbol * sentencias_while;
 t_nodo_arbol * nodo_id;
+t_nodo_arbol * nodo_id1;
 t_nodo_arbol * nodo_ids;
 t_nodo_arbol * nodo_exp;
 t_nodo_arbol * nodo_lista_id;
@@ -140,7 +142,13 @@ t_nodo_arbol *nodo_asig;
 t_nodo_arbol *nodo_div;
 t_nodo_arbol *nodo_mod;
 t_nodo_arbol *nodo_mult;
+t_nodo_arbol *nodo_inicio;
+t_nodo_arbol *nodo_programa;
+t_nodo_arbol *nodo_start;
+t_nodo_arbol *nodo_asigna;
 
+t_pila * pila_asigna;
+t_pila * pila_asignacion;
 t_pila * pila_asignacionmult;
 t_pila * pila_iteracion;
 t_pila * pila_condicional;
@@ -148,6 +156,8 @@ t_pila * pila_comparaciones;
 t_pila * pila_condiciones;
 t_cola * cola_sentencias;
 t_cola * cola_expresiones;
+t_cola * cola_asignacion;
+t_cola* cola_id;
 t_pila* pila_id;
 t_pila * pila_exp;
 t_pila * pila_expre;
@@ -211,7 +221,7 @@ tsimbolos ts[100];
 %token ENDWHILE
 %token MOD
 %token DIV
-%token WRITE
+%token <str>WRITE
 %token READ
 %token PUNTO_COMA
 %token L_A
@@ -225,17 +235,22 @@ tsimbolos ts[100];
 
 %%
 start:	programa	{
+
+
 	printf("\n---------------------------\n");
 	printf("\n****COMPILACION EXITOSA****\n");
 	printf("\n---------------------------\n");
 
-	arbol_ejecucion->p_nodo = obtener_raiz(nodo_sentencias);
+	nodo_start=nodo_sentencias;
+	arbol_ejecucion->p_nodo = obtener_raiz(nodo_start);
+
 	crearAssembler(arbol_ejecucion->p_nodo);
+    //recorrer_en_orden(arbol_ejecucion->p_nodo,&visitar);
 }
 
-programa: declaracion inicio	{arbol_ejecucion->p_nodo = obtener_raiz(nodo_sentencias);}
-	| declaracion								{arbol_ejecucion->p_nodo = obtener_raiz(nodo_sentencias);}
-	| lista_io								{arbol_ejecucion->p_nodo = obtener_raiz(nodo_sentencias);}
+programa: declaracion  inicio
+	| declaracion
+	| lista_io
 ;
 
 /*
@@ -284,12 +299,14 @@ definicion: lista
 lista: ID DOS_PUNTOS tipo_dato {
 		printf("\n***REGLA 3 -> Lista_Id:\n");
 		printf("\t\t\tID\n");
+		printf("%s\n",$1);
 		capturaTipo(yytext);
 	}
 	| ID COMA lista {
 		printf("\n***REGLA 4 -> Lista_Id:\n");
 		capturaTipo(yytext);
 		printf("\t\t\tID COMA Lista_Id\n");
+		printf("%s\n",$1);
 	}
 ;
 
@@ -310,6 +327,7 @@ tipo_dato: INTEGER {
 inicio:	lista_sentencias {
 		printf("\n***REGLA 8 -> Inicio:\n");
 		printf("\t\t\tLista_Sentencias\n");
+
 	}
 ;
 
@@ -339,7 +357,7 @@ sentencia:asignacion {
 		printf("\n***REGLA 11 -> Sentencia:\n");
 		printf("\t\t\tAsignacion\n");
 
-		nodo_sentencia =crear_nodo_arbol(crear_info(";"),nodo_asignacion,NULL);
+		nodo_sentencia = crear_nodo_arbol(crear_info(";"),nodo_asignacionmult,NULL);
 		insertar_en_cola(&cola_sentencias,crear_info_sentencias(nodo_sentencia));
 		//recorrer_en_orden(nodo_sentencia,&visitar);
 	}
@@ -374,6 +392,7 @@ sentencia:asignacion {
 		printf("\t\t\tEntSal\n");
 		nodo_sentencia = crear_nodo_arbol(crear_info(";"),nodo_entsal,NULL);
 		insertar_en_cola(&cola_sentencias,crear_info_sentencias(nodo_sentencia));
+	    //recorrer_en_orden(nodo_sentencia,&visitar);
 	}
 ;
 
@@ -396,27 +415,27 @@ asignacion: lista_id OPE_ASIG expresion PUNTO_COMA {
 		}*/
 
 		t_info_sentencias * p_info = sacar_de_pila(&pila_expresiones);
-		/* guardo la asignacion en el arbol de ejecucion */
-		nodo_asignacion = crear_nodo_arbol(crear_info("="),crear_hoja(crear_info($1)),p_info->a);
+		nodo_asignacionmult = crear_nodo_arbol(crear_info("="),crear_hoja(crear_info($1)),p_info->a);
 	}
 ;
 
 lista_id:ID {
 		printf("\n***REGLA 16 -> Lista_id:\n");
 		printf("\t\t\tID\n");
-																						existe_Id($1);
+		existe_Id($1);
 
-		nodo_id = crear_hoja(crear_info($1));
-		insertar_en_pila(&pila_id,crear_info_sentencias(nodo_id));
+		nodo_id1 = crear_hoja(crear_info($1));
+		//insertar_en_cola(&cola_id,crear_info_sentencias(nodo_id1));
+
+		cont=cont +1;
 	}
-	| lista_id OPE_ASIG ID {
+	| lista_id OPE_ASIG ID{
+
 		printf("\n***REGLA 17 -> Lista_id:\n");
 		printf("\t\t\tlista_asig OPE_ASIG ID\n");
 		existe_Id($1);
 
-		nodo_id = crear_hoja(crear_info($1));
-
-		insertar_en_pila(&pila_id,crear_info_sentencias(nodo_id));
+		cont=cont +1;
 	}
 ;
 
@@ -433,14 +452,14 @@ entsal: WRITE CTE_STR PUNTO_COMA {
 		sprintf(cad1,"%d",n);
 		strcat(cad,cad1);
 
-		nodo_print = crear_nodo_arbol(crear_info("WRITE"),NULL,crear_hoja(crear_info(cad)));
+		nodo_print = crear_nodo_arbol(crear_info("WRITE"),crear_hoja(crear_info(cad)),NULL);
 		nodo_entsal=nodo_print;
 	}
 	| WRITE ID PUNTO_COMA {
 		printf("\n***REGLA 19 -> EntSal: \n");
 		printf("\t\t\t WRITE ID PUNTO_COMA\n");
 		existe_Id($2);
-		nodo_print1 = crear_nodo_arbol(crear_info("WRITE"),NULL, crear_hoja(crear_info($2)));
+		nodo_print1 = crear_nodo_arbol(crear_info("WRITE"),crear_hoja(crear_info($2)),NULL);
 		nodo_entsal=nodo_print1;
 	}
 	| READ ID PUNTO_COMA {
@@ -448,7 +467,7 @@ entsal: WRITE CTE_STR PUNTO_COMA {
 		printf("\t\t\t READ ID PUNTO_COMA\n");
 		existe_Id($2);
 
-		nodo_read = crear_nodo_arbol(crear_info("READ"),NULL, crear_hoja(crear_info($2)));
+		nodo_read = crear_nodo_arbol(crear_info("READ"),crear_hoja(crear_info($2)),NULL);
 		nodo_entsal=nodo_read;
 	}
 ;
@@ -622,12 +641,13 @@ condicion_doble: condicion_simple AND condicion_simple {
 	}
 ;
 
-iteracion:WHILE condicion L_A lista_sentencias L_C {
+iteracion:WHILE condicion L_A lista_sentencias  { sentencias_while=obtener_raiz(nodo_sentencias);}L_C {
 		printf("\n***REGLA 34 -> Iteracion:\n");
 		printf("\t\t\t WHILE Condicion L_A Lista_Sentencias L_C\n");
-		sentencias_while= obtener_raiz(nodo_sentencias);
+
 		t_info_sentencias * p_info = sacar_de_pila(&pila_condiciones);
 		nodo_iteracion = crear_nodo_arbol(crear_info("WHILE"),p_info->a,sentencias_while);
+		//recorrer_en_orden(nodo_iteracion,&visitar);
 		insertar_en_pila(&pila_iteracion,crear_info_sentencias(nodo_iteracion));
 	}
 ;
@@ -684,7 +704,7 @@ expresion: termino {
 		strcpy(auxiliarter,$3);
 		/* guardo la expresion en el arbol de ejecucion */
 		t_info_sentencias * p_nodo_expresion = sacar_de_pila(&pila_expresiones);
-		t_info_sentencias * p_nodo_termino =		  sacar_de_pila(&pila_terminos);
+		t_info_sentencias * p_nodo_termino = sacar_de_pila(&pila_terminos);
 		nodo_expresion = crear_nodo_arbol(crear_info("-"),p_nodo_expresion->a,p_nodo_termino->a);
 		insertar_en_pila(&pila_expresiones,crear_info_sentencias(nodo_expresion));
 		insertar_en_cola(&cola_expresiones,crear_info_sentencias(nodo_expresion));
@@ -829,7 +849,7 @@ factor: ID {
 		sprintf(cad1,"%d",n);
 		strcat(cad,cad1);
 
-		nodo_factor =		  crear_hoja(crear_info(cad));
+		nodo_factor = crear_hoja(crear_info(cad));
 		insertar_en_pila(&pila_factores,crear_info_sentencias(nodo_factor));
 
 	}
@@ -846,7 +866,7 @@ factor: ID {
 		sprintf(cad1,"%d",n);
 		strcat(cad,cad1);
 
-		nodo_factor =		  crear_hoja(crear_info(cad));
+       	nodo_factor = crear_hoja(crear_info(cad));
 		insertar_en_pila(&pila_factores,crear_info_sentencias(nodo_factor));
 	}
 	| OPE_RES factor %prec OPE_MUL {
@@ -866,6 +886,7 @@ int main(int argc,char *argv[])
 		crear_pila(&pila_id);
 		crear_cola(&cola_expresiones);
 		crear_cola(&cola_sentencias);
+		crear_cola(&cola_asignacion);
 		crear_pila(&pila_comparaciones);
 		crear_pila(&pila_condiciones);
 		crear_pila(&pila_factores);
@@ -874,14 +895,16 @@ int main(int argc,char *argv[])
 		crear_pila(&pila_exp);
 		crear_pila(&pila_expre);
 		crear_pila(&pila_asignacionmult);
+		crear_pila(&pila_asigna);
+		crear_pila(&pila_asignacion);
 		crear_arbol(&arbol_ejecucion);
 
 		yyparse();
 
 		guardarTabladeSimbolosEnUnArchivo();
-		arbol_ejecucion->p_nodo = obtener_raiz(nodo_sentencia);
-		print_t(arbol_ejecucion->p_nodo);
-		//recorrer_en_orden(arbol_ejecucion->p_nodo,&visitar);
+        arbol_ejecucion->p_nodo = obtener_raiz(nodo_start);
+	    print_t(arbol_ejecucion->p_nodo);
+
 	}
 	fclose(yyin);
 	return 0;
@@ -914,14 +937,18 @@ t_info * crear_info(char * str)
 t_nodo_arbol * crear_nodo_arbol(t_info * info, t_nodo_arbol * p_nodo_izq, t_nodo_arbol * p_nodo_der)
 {
 	t_nodo_arbol * p_nodo = (t_nodo_arbol * ) malloc(sizeof(t_nodo_arbol));
+
 	p_nodo->padre = NULL;
 	p_nodo->info= info;
 	p_nodo->nodo_der = p_nodo_der;
 	p_nodo->nodo_izq = p_nodo_izq;
+
+
 	if(p_nodo_der)
-		p_nodo_der->padre = p_nodo;
+	p_nodo_der->padre = p_nodo;
 	if(p_nodo_izq)
-		p_nodo_izq->padre = p_nodo;
+	p_nodo_izq->padre = p_nodo;
+
 
 	return p_nodo;
 }
@@ -1200,7 +1227,7 @@ void crearAssembler(t_nodo_arbol *arbol)
 			fprintf(a, "%s		  dd		  ?\n",ts[s].nombre);
 		}
 		if(!strcmp(ts[s].tipoDato,"STRING")) {
-			fprintf(a, "%s		  db		  LEN_LEXEMA DUP(?),'$'\n",ts[s].nombre);
+			fprintf(a, "%s		  db		  '$'\n",ts[s].nombre);
 		}
 		if(!strcmp(ts[s].tipoDato,"INTEGER")) {
 			fprintf(a, "%s		  dd		  ?\n",ts[s].nombre);
@@ -1233,13 +1260,17 @@ void crearAssembler(t_nodo_arbol *arbol)
 
 	if(whiles>0) {
 		fprintf(a, "\njmp ");
+		char buffer[2];//
+		sprintf(buffer, "%d", whiles);///
 		fprintf(a, "end_while");
+		fprintf(a, "%s", buffer);///
 		fprintf(a, "\nend_while");
 		char buf[2];
 		sprintf(buf, "%d", whiles);
 		fprintf(a, "%s", buf);
 		fprintf(a, ":");
 		whiles--;
+
 	}
 
 	fprintf(a, "\n\nmov AX, 4C00h");
@@ -1255,8 +1286,9 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 	if(strcmp(n->info->a,"=")==0) {
 		if(es_hoja(n->nodo_der)) {
 			//Si el nodo derecho es Hoja hace la asignacion
-			fprintf(a, "\nfld ; asignacion");
+			fprintf(a, "\nfld ");
 			fprintf(a, "%s", n->nodo_der->info->a);
+			fprintf(a, ";asignacion");
 			fprintf(a, "\nfstp ");
 			fprintf(a, "%s", n->nodo_izq->info->a);
 		} else if(!es_hoja(n->nodo_der)) {
@@ -1413,7 +1445,7 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 			fprintf(a, "%s", n->nodo_der->info->a);
 			fprintf(a, "\nfld ");
 			fprintf(a, "%s", n->nodo_izq->info->a);
-			fprintf(a, "\nfidiv");
+			fprintf(a, "\nfdiv");
 			fprintf(a, "\nfstp ");
 
 			if(!usar_aux2) {
@@ -1434,7 +1466,7 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 				fprintf(a, "aux2");
 			}
 
-			fprintf(a, "\nfidiv");
+			fprintf(a, "\nfdiv");
 			fprintf(a, "\nfstp ");
 
 			if(!usar_aux2) {
@@ -1612,18 +1644,18 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 		char buf[2];
 		sprintf(buf, "%d", whiles);
 		fprintf(a, "%s", buf);
-	} else if(strcmp(n->info->a,"WRITE")==0 && strcmp(n->padre->info->a, ";")==0) {
-		//printf("%s\n",n->nodo_der->info->a);
-		int tipo = traer_tipo_con_prefijo(n->nodo_der->info->a);
+	} else if(strcmp(n->info->a,"WRITE")==0 && strcmp(n->padre->info->a,";")==0) {
+         //printf("%s\n",n->nodo_izq->info->a);
+		int tipo = traer_tipo_con_prefijo(n->nodo_izq->info->a);
 
-		if(tipo!=3) {
+		if(tipo == 1) {
 			fprintf(a, "\nDisplayFloat ");
-			fprintf(a, "%s", n->nodo_der->info->a);
+			fprintf(a, "%s", n->nodo_izq->info->a);
 			fprintf(a, " 2");
 			fprintf(a, "\nnewLine 1");
 		} else {
 			fprintf(a, "\nDisplayString ");
-			fprintf(a, "%s", n->nodo_der->info->a);
+			fprintf(a, "%s", n->nodo_izq->info->a);
 			fprintf(a, "\nnewLine 1");
 		}
 	} else if(strcmp(n->info->a,"READ")==0 && strcmp(n->padre->info->a,";")==0) {
@@ -1631,15 +1663,15 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 		fprintf(a, "\nmov ah, 9");
 		fprintf(a, "\nint 21h");
 		fprintf(a, "\nnewLine 1");
-		int tipo = traer_tipo_con_prefijo(n->nodo_der->info->a);
+		int tipo = traer_tipo_con_prefijo(n->nodo_izq->info->a);
 
-		if(tipo!=3) {
+		if(tipo == 1) {
 			fprintf(a, "\nGetFloat ");
-			fprintf(a, "%s", n->nodo_der->info->a);
+			fprintf(a, "%s", n->nodo_izq->info->a);
 			fprintf(a, "\nnewLine 1");
 		} else {
 			fprintf(a, "\nGetString ");
-			fprintf(a, "%s", n->nodo_der->info->a);
+			fprintf(a, "%s", n->nodo_izq->info->a);
 			fprintf(a, "\nnewLine 1");
 		}
 	}

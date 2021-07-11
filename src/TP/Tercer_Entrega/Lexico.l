@@ -506,7 +506,7 @@ int traer_tipo_con_prefijo(char * nombre) {
 	  if(strcmp(ts[u].nombre,nombre)==0){
 
 	    if(strcmp(ts[u].tipoDato,"CTE_STR" )==0 ||strcmp(ts[u].tipoDato,"STRING" )==0)
-        return 3;
+        return 0;
 	   else if (strcmp(ts[u].tipoDato,"CTE_REAL")==0 || strcmp(ts[u].tipoDato,"FLOAT" )==0)
        return 1;
 
