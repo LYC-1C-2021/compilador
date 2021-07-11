@@ -8,7 +8,7 @@ ENDDEC
 
 
 p3 = -1054.23;
-p3 = -5343;
+b4 = 343;
 -/ Prueba Ctes numericas y Asignaciones /-
 
 a1 = 99999.99;
@@ -19,19 +19,17 @@ a3 = .9999;
 -/ Prueba Ctes numericas y Asignaciones /-
 a1 = a2 = a3 = 22*9+2;
 
-WRITE "ewr"; -/ debe ser una cte string /-
 READ p1;  -/ donde base es una variable /-
 WRITE variable1; -/donde var1 es una variable numerica definida previamente /-
 
 
 -/ Prueba Iteracion /-
 
-WHILE(p1<b1)
+WHILE(p1<b4)
 {
 
 	a2=b1;
 	-/ Entrada _ Salida /-
-	WRITE "ewr"; -/ debe ser una cte string /-
 }
 
 b4 = 21 % 2;
