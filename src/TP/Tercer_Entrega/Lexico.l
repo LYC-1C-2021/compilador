@@ -36,16 +36,16 @@ void capturaTipo(char *);
 
 typedef struct {
        		    char nombre[50]; // lexema
-                char tipoDato[100];				
-                char valor[30];	
+                char tipoDato[100];
+                char valor[30];
 				char longitud[25];
 	            } tsimbolos;
 //pila con lexemas para agregar a la TS, puede guardar 100 lexemas.
 tsimbolos ts[100];
 %}
 
-%option noyywrap  
-%option yylineno 
+%option noyywrap
+%option yylineno
 
 DIGITO [0-9]
 LETRA  [a-zA-Z]
@@ -83,7 +83,7 @@ READ "READ"|"read"|"Read"
 %%
 
 "DECVAR"			{ return DECVAR; }
-"ENDDEC"		{ return ENDDEC; }			
+"ENDDEC"		{ return ENDDEC; }
 {FLOAT}			{return FLOAT; }
 {INTEGER}		{return INTEGER; }
 {STRING}		{return STRING;}
@@ -124,19 +124,19 @@ READ "READ"|"read"|"Read"
 					{
 						guardarLexemas(yytext,1);
 						yylval.str =strdup(yytext);
-						return CTE_STR;					
+						return CTE_STR;
 					}
 				}
-				
 
-{CTE_INT}		{	
+
+{CTE_INT}		{
 					if(verificarTamanio(CTE_INT) == 0)
 					{
 						printf("-------------ERROR-------------\n");
 						printf("     Integer fuera de rango.   \n");
 						system ("Pause");
 						exit(1);
-					
+
 					}
 					else
 					{
@@ -146,22 +146,22 @@ READ "READ"|"read"|"Read"
 					}
 
 				}
-				
-{CTE_REAL}	{	
+
+{CTE_REAL}	{
 				if(verificarTamanio(CTE_REAL) == 0)
 					{
 						printf("-------------ERROR-------------\n");
 						printf("       Real fuera de rango.    \n");
 						system ("Pause");
 						exit(1);
-					
+
 					}
 					else
 					{
 						guardarLexemas(yytext,3);
 						yylval.str =strdup(yytext);
 						return CTE_REAL;
-					
+
 					}
 
 
@@ -187,19 +187,20 @@ READ "READ"|"read"|"Read"
 
 
 
-"\n"      		
+"\n"
 "\t"
-" "	
-"\r\n" 
+" "
+"\r\n"
+.           { errorCharInvalido(); }
 %%
 
 void guardarTabladeSimbolosEnUnArchivo()
 {
-FILE* arch; 
+FILE* arch;
 int x;
- 
+
     arch = fopen("ts.txt", "w+");
-	
+
 	if (!arch){
 		printf("Error. No se pudo crear el archivo ts.txt");
 	exit(1);
@@ -210,24 +211,24 @@ int x;
 	fprintf(arch,"%-23s%-15s%-20s%8s",ts[x].nombre,ts[x].tipoDato,ts[x].valor,ts[x].longitud);
 	fprintf(arch,"\n");
 	}
-    
-	 fclose(arch);    
+
+	 fclose(arch);
 }
- 
+
 void guardarLexemas(char *nombre,int val)
 {
-    
+
      if(val==0)
 	{
-      
+
 	   if(buscar(nombre)!=0)
 	   {
 	      strcpy(ts[i].nombre,nombre);
-		
+
 		  i++;//incremento para conocer la cantidad de id que hay en la ctes
-	   } 
-	 
-	
+	   }
+
+
 	}
     if(val==1)
 	{
@@ -235,54 +236,54 @@ void guardarLexemas(char *nombre,int val)
 		s++;//adelanto el puntero para que no tome la 1eras comillas
 		int n=strlen(nombre)-2;//le resto 2 para que no copie las comillas (iniciales y finales)
 		strncpy(nombre,s,n);
-		while(n > 1)//llevo el puntero hasta la posicion que debe finalizar el string 
+		while(n > 1)//llevo el puntero hasta la posicion que debe finalizar el string
 		{
 			n--;
 		    s++;
 		}
 	    memset(s, '\0',n);//marco el fin del string
-		
+
 	  if(buscar(nombre)!=0)
 	  {
-	   
-	   
+
+
 	   char aux[10];
 	   char aux1[10];
 	   strcpy(aux,"cte");
 	   p++;
      sprintf(aux1,"%d",p);
 	   strcat(aux,aux1);
-	   
+
 	   strcpy(ts[i].nombre,"_");
        strcat(ts[i].nombre,aux);
-	   
+
 	   strcpy(ts[i].valor,nombre);
      sprintf(ts[i].longitud,"%lu",strlen(nombre));
-	  
-        i++;//incremento para conocer la cantidad de id que hay en la ctes				   
+
+        i++;//incremento para conocer la cantidad de id que hay en la ctes
       }
-	
-	} 
+
+	}
    if(val==2)
 	{
 
     if(buscar(nombre)!=0)
 	 {
-	  
+
 	   char aux[10];
 	   char aux1[10];
 	   strcpy(aux,"cte");
 	   p++;
      sprintf(aux1,"%d",p);
 	   strcat(aux,aux1);
-	   
+
 	   strcpy(ts[i].nombre,"_");
        strcat(ts[i].nombre,aux);
 	    strcpy(ts[i].valor,nombre);
 	    i++;//incremento para conocer la cantidad de id que hay en la ctes
       }
-			
-    
+
+
 	}
      if(val==3)
 	{
@@ -297,27 +298,27 @@ void guardarLexemas(char *nombre,int val)
 	   p++;
      sprintf(aux1,"%d",p);
 	   strcat(aux,aux1);
-	  
+
 	   strcpy(ts[i].nombre,"_");
        strcat(ts[i].nombre,aux);
 	   strcpy(ts[i].valor,nombre);
-	  
+
 	   i++;//incremento para conocer la cantidad de id que hay en la ctes
       }
-			
-    
-	}      
+
+
+	}
 }
 
 int buscar(char * nombre)
 {
  int x;
-  
+
   for(x=0;x<i;x++){//50 cantidad de lexemas en la tabla
-  if(strcmp(ts[x].nombre,nombre)==0)  
-   return 0;  
+  if(strcmp(ts[x].nombre,nombre)==0)
+   return 0;
   }
- 
+
    return 1;
 }
 
@@ -337,7 +338,7 @@ int verificarTamanio(int opc){
 			return 0;
 			break;
 		case CTE_STR:
-			if(strlen(yytext) <= LIM_STR) 
+			if(strlen(yytext) <= LIM_STR)
 				return 1;
 			return 0;
 			break;
@@ -367,13 +368,13 @@ void agregar_tipo_a_TS(char *nombre,char *tipo)
 	for(h=0;h<100;h++)
 	{
 	  if(strcmp(ts[h].valor,nombre)==0)
-	  {  
+	  {
 		  strcpy(ts[h].tipoDato,tipo);
-       }		 	
-	}		
+       }
+	}
 }
 
-	
+
 
 int tipos(char *nombre)
 {
@@ -381,9 +382,9 @@ int tipos(char *nombre)
   	for(n=0;n<100;n++)
 	{
 	  if(strcmp(ts[n].nombre,nombre)==0 && strcmp(ts[n].nombre,"CTE_STR")==0)
-	  {  
+	  {
 		return 0;
-       }		 	
+       }
 	}
 	return 1;
 }
@@ -396,12 +397,13 @@ void existe_Id(char *id)
 	{
 	   if(strcmp(ts[n].nombre,id)==0)
 	     index=n;
-       	
+
 	}
 
     if(strcmp(ts[index].tipoDato,"")==0)
-	{ 
+	{
        printf("\nvariable no declarada pero usada\n");
+			 exit(1);
 	}
 }
 
@@ -409,8 +411,8 @@ int tipo_dato(char *exp,char *ter)//Modificada
 {
 	puts("ENTROOOOOOO");
     int v,b,index1,index2;
-	char aux[30],aux1[30];	
-	
+	char aux[30],aux1[30];
+
 	strcpy(aux,"_");
     strcat(aux,exp);
 	for(v=0;v<100;v++)
@@ -418,7 +420,7 @@ int tipo_dato(char *exp,char *ter)//Modificada
 	  if(strcmp(ts[v].nombre,aux)==0)
 	     index1=v;
 	}
-    
+
 	strcpy(aux1,"_");
     strcat(aux1,ter);
 	for(b=0;b<100;b++)
@@ -427,17 +429,17 @@ int tipo_dato(char *exp,char *ter)//Modificada
 	     index2=b;
 	}
 	printf("tipo %s es: %s\n",exp, ts[index1].tipoDato);
-	printf("tipo %s es: %s\n", ter, ts[index2].tipoDato);    
-	
+	printf("tipo %s es: %s\n", ter, ts[index2].tipoDato);
+
 	if((strcmp(ts[index1].tipoDato,"INTEGER")==0 && strcmp(ts[index2].tipoDato,"CTE_INT")==0) ||
     (strcmp(ts[index1].tipoDato,"FLOAT")==0 && strcmp(ts[index2].tipoDato,"CTE_REAL")==0) ||
     (strcmp(ts[index1].tipoDato,"STRING")==0 && strcmp(ts[index2].tipoDato,"CTE_STR")==0) ||
     (strcmp(ts[index1].tipoDato,"INTEGER")==0 && strcmp(ts[index2].tipoDato,"CTE_INT")==0) ||
     (strcmp(ts[index1].tipoDato,"FLOAT")==0 && strcmp(ts[index2].tipoDato,"CTE_REAL")==0))
-	{ 
+	{
        return 0;
 	}else
-	{ 
+	{
       return 1;
 	}
 
@@ -448,7 +450,7 @@ int tipos_iguales(char *id,char *exp)
 {
     int c,v,b,index,index2,index3;
 	char aux[30],aux1[30];
-	
+
 	for(c=0;c<100;c++)
 	{
 	  if(strcmp(ts[c].nombre,id)==0)
@@ -465,12 +467,12 @@ int tipos_iguales(char *id,char *exp)
 
 	if((strcmp(ts[index].tipoDato,"INTEGER")==0 && strcmp(ts[index3].tipoDato,"INTEGER")==0) ||
 	  (strcmp(ts[index].tipoDato,"FLOAT")==0 && strcmp(ts[index3].tipoDato,"FLOAT")==0))
-	{ 
+	{
        return 0;
 	}
 	else
    {
-    //printf("%s",exp);    
+    //printf("%s",exp);
 	strcpy(aux1,"_");
     strcat(aux1,exp);
     for(v=0;v<100;v++)
@@ -484,34 +486,33 @@ int tipos_iguales(char *id,char *exp)
     (strcmp(ts[index].tipoDato,"FLOAT")==0 && strcmp(ts[index2].tipoDato,"CTE_REAL")==0) ||
     (strcmp(ts[index].tipoDato,"FLOAT")==0 && strcmp(ts[index2].tipoDato,"CTE_INT")==0) ||
     (strcmp(ts[index].tipoDato,"STRING")==0 && strcmp(ts[index2].tipoDato,"CTE_STR")==0))
-	{ 
+	{
        return 0;
 	}else
-	{ 
+	{
       return 1;
 	}
-  
+
 }
-} 
+}
 
 int traer_tipo_con_prefijo(char * nombre) {
-	
+
 	int u;
-	
-	
+
+
 	for(u=0;u<100;u++)
 	{
 	  if(strcmp(ts[u].nombre,nombre)==0){
-	  
+
 	    if(strcmp(ts[u].tipoDato,"CTE_STR" )==0 ||strcmp(ts[u].tipoDato,"STRING" )==0)
         return 0;
 	   else if (strcmp(ts[u].tipoDato,"CTE_REAL")==0 || strcmp(ts[u].tipoDato,"FLOAT" )==0)
-       return 1;		   
-       		 
+       return 1;
+
 	  }
-	
+
 	}
-	return 0;	
-	
+	return 0;
+
 }
-		

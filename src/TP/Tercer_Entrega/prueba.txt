@@ -15,9 +15,9 @@ a1 = 99999.99;
 a2 = 99.;
 a3 = .9999;
 
-
--/ Prueba Ctes numericas y Asignaciones /-
+-/ Prueba Ctes numericas y Asignaciones MULTIPLES /-
 a1 = a2 = a3 = 22*9+2;
+a1 = a2 = a3 = "constante string";
 
 READ p1;  -/ donde base es una variable /-
 WRITE variable1; -/donde var1 es una variable numerica definida previamente /-
@@ -34,6 +34,7 @@ WHILE(p1<b4)
 
 b4 = 21 % 2;
 b4 = 21 DIV 2;
+b4 = 21 MOD 2;
 
 -/ Prueba seleccion /-
 
@@ -45,3 +46,20 @@ ELSE
 {
 	a1=a1+a2;
 }
+
+IF (b5>30 AND b5<40)
+{
+	WRITE "Condicion doble AND";
+}
+
+IF (b5<30 OR b5>40)
+{
+	WRITE "Condicion doble OR";
+}
+
+-/ El compilador permite sentencias WRITE CTE_STR sin tener de declaraciones /-
+-/ Para probarlo copiar este bloque, borrar el contenido de este archivo, pegar y compilar /-
+WRITE "str 1";
+WRITE "str 2";
+WRITE "str 3";
+WRITE "str 4";
