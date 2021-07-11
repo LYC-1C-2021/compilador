@@ -26,13 +26,26 @@ _cte5		  dd		  .9999
 _cte6		  dd		  22
 _cte7		  dd		  9
 _cte8		  dd		  2
-_cte9		  db		  'ewr','$'
+_cte9		  db		  'constante string','$'
 _cte10		  db		  'ewr','$'
-_cte11		  dd		  21
-_cte12		  dd		  2
-_cte13		  dd		  21
-_cte14		  dd		  2
-_cte15		  dd		  30
+_cte11		  db		  'ewr','$'
+_cte12		  dd		  21
+_cte13		  dd		  2
+_cte14		  dd		  21
+_cte15		  dd		  2
+_cte16		  dd		  21
+_cte17		  dd		  2
+_cte18		  dd		  30
+_cte19		  dd		  30
+_cte20		  dd		  40
+_cte21		  db		  'Condicion doble AND','$'
+_cte22		  dd		  30
+_cte23		  dd		  40
+_cte24		  db		  'Condicion doble OR','$'
+_cte25		  db		  'str 1','$'
+_cte26		  db		  'str 2','$'
+_cte27		  db		  'str 3','$'
+_cte28		  db		  'str 4','$'
 
 aux1 dd ?
 aux2 dd ?
@@ -61,7 +74,9 @@ fld _cte8
 fld aux1
 fadd
 fstp aux1
-DisplayFloat ewr 2
+fld ; asignacion_cte9
+fstp a1
+DisplayString _cte10
 newLine 1
 mov dx, OFFSET read
 mov ah, 9
@@ -85,19 +100,23 @@ ffree st(0)
 jbe while1
 fld ; asignacionb1
 fstp a2
-DisplayFloat ewr 2
+DisplayString _cte11
 newLine 1
-fld _cte10
-fld _cte9
+fld _cte13
+fld _cte12
 fprem
 fstp aux1
-fld _cte12
-fld _cte11
+fld _cte15
+fld _cte14
 fidiv
+fstp aux1
+fld _cte17
+fld _cte16
+fprem
 fstp aux1
 fld b5
 fstp aux1
-fld _cte13
+fld _cte18
 fstp aux2
 fld aux1
 fcomp aux2
@@ -114,7 +133,47 @@ fld a2
 fld a1
 fadd
 fstp aux1
-end_if1:
+fld b5
+fstp aux1
+fld _cte19
+fstp aux2
+fld b5
+fstp aux1
+fld _cte20
+fstp aux2
+fld aux1
+fcomp aux2
+fstsw ax
+sahf
+ffree st(0)
+jbe end_if2
+DisplayString _cte21
+newLine 1
+fld b5
+fstp aux1
+fld _cte22
+fstp aux2
+fld b5
+fstp aux1
+fld _cte23
+fstp aux2
+fld aux1
+fcomp aux2
+fstsw ax
+sahf
+ffree st(0)
+jle end_if3
+DisplayString _cte24
+newLine 1
+DisplayString _cte25
+newLine 1
+DisplayString _cte26
+newLine 1
+DisplayString _cte27
+newLine 1
+DisplayString _cte28
+newLine 1
+end_if3:
 jmp end_while
 end_while1:
 

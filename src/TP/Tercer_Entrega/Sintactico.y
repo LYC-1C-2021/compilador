@@ -235,7 +235,37 @@ start:	programa	{
 
 programa: declaracion inicio	{arbol_ejecucion->p_nodo = obtener_raiz(nodo_sentencias);}
 	| declaracion								{arbol_ejecucion->p_nodo = obtener_raiz(nodo_sentencias);}
-	| lista_io									{arbol_ejecucion->p_nodo = obtener_raiz(nodo_entsal);}
+	| lista_io								{arbol_ejecucion->p_nodo = obtener_raiz(nodo_sentencias);}
+;
+
+/*
+	lista_io permite escribir sentencias WRITE "str"
+	sin necesidad de escribir un bloque de declaraciones
+*/
+lista_io: lista_io entsal {
+		printf("\n***REGLA 14 -> Sentencia:\n");
+		printf("\t\t\tEntSal\n");
+		nodo_sentencia = crear_nodo_arbol(crear_info(";"),nodo_entsal,NULL);
+		insertar_en_cola(&cola_sentencias,crear_info_sentencias(nodo_sentencia));
+
+		if(cola_sentencias!=NULL) {
+			t_info_sentencias * sentencia_apilada = sacar_de_cola(&cola_sentencias);
+			nodo_sentencias->nodo_der = sentencia_apilada->a;
+			nodo_sentencias->nodo_der->padre = nodo_sentencias;
+			nodo_sentencias = sentencia_apilada->a;
+		}
+	}
+ | entsal {
+		printf("\n***REGLA 14 -> Sentencia:\n");
+		printf("\t\t\tEntSal\n");
+		nodo_sentencia = crear_nodo_arbol(crear_info(";"),nodo_entsal,NULL);
+		insertar_en_cola(&cola_sentencias,crear_info_sentencias(nodo_sentencia));
+
+		if(cola_sentencias!=NULL) {
+			t_info_sentencias * sentencia_apilada = sacar_de_cola(&cola_sentencias);
+			nodo_sentencias = sentencia_apilada->a;
+		}
+ }
 ;
 
 declaracion: DECVAR definicion ENDDEC {
@@ -395,14 +425,22 @@ entsal: WRITE CTE_STR PUNTO_COMA {
 		printf("\t\t\t WRITE CTE_STR PUNTO_COMA\n");
 
 		agregar_tipo_a_TS(yylval.str,"CTE_STR");
-		nodo_print = crear_nodo_arbol(crear_info("WRITE"),crear_hoja(crear_info("WRITE")),crear_hoja(crear_info($2)));
+
+		char cad[10];
+		char cad1[10];
+		strcpy(cad,"_cte");
+		n++;
+		sprintf(cad1,"%d",n);
+		strcat(cad,cad1);
+
+		nodo_print = crear_nodo_arbol(crear_info("WRITE"),NULL,crear_hoja(crear_info(cad)));
 		nodo_entsal=nodo_print;
 	}
 	| WRITE ID PUNTO_COMA {
 		printf("\n***REGLA 19 -> EntSal: \n");
 		printf("\t\t\t WRITE ID PUNTO_COMA\n");
 		existe_Id($2);
-		nodo_print1 = crear_nodo_arbol(crear_info("WRITE"),crear_hoja(crear_info("WRITE")),crear_hoja(crear_info($2)));
+		nodo_print1 = crear_nodo_arbol(crear_info("WRITE"),NULL, crear_hoja(crear_info($2)));
 		nodo_entsal=nodo_print1;
 	}
 	| READ ID PUNTO_COMA {
@@ -410,7 +448,7 @@ entsal: WRITE CTE_STR PUNTO_COMA {
 		printf("\t\t\t READ ID PUNTO_COMA\n");
 		existe_Id($2);
 
-		nodo_read = crear_nodo_arbol(crear_info("READ"),crear_hoja(crear_info("READ")),crear_hoja(crear_info($2)));
+		nodo_read = crear_nodo_arbol(crear_info("READ"),NULL, crear_hoja(crear_info($2)));
 		nodo_entsal=nodo_read;
 	}
 ;
@@ -814,16 +852,6 @@ factor: ID {
 	| OPE_RES factor %prec OPE_MUL {
 		printf("\n***REGLA 47 -> EXPRESION:\n");
 		printf("\t\t\t OPE_RES factor\n");
-	}
-;
-
-lista_io: lista_io entsal {
-		printf("\n***REGLA 48 -> Lista_io:\n");
-		printf("\t\t\t Lista_io -> Lista_io Entrada\n");
-	}
-	| entsal {
-		printf("\n***REGLA 49 -> Lista_io:\n");
-		printf("\t\t\t Lista_io -> Entrada\n");
 	}
 ;
 
