@@ -6,7 +6,7 @@ p1, p2, p3 : FLOAT
 b4,b5 : INTEGER
 ENDDEC
 
-
+b5=35;
 p3 = -1054.23;
 b4 = 343;
 -/ Prueba Ctes numericas y Asignaciones /-
@@ -15,33 +15,36 @@ a1 = 99999.99;
 a2 = 99.;
 a3 = .9999;
 
-
--/ Prueba Ctes numericas y Asignaciones /-
+-/ Prueba Ctes numericas y Asignaciones MULTIPLES /-
 a1 = a2 = a3 = 22*9+2;
 
 READ p1;  -/ donde base es una variable /-
 WRITE variable1; -/donde var1 es una variable numerica definida previamente /-
-
+WRITE "Se ingreso";
+WRITE p1;
 
 -/ Prueba Iteracion /-
 
-WHILE(p1<b4)
+WHILE(p1<b4 OR p3<b4)
 {
-
 	a2=b1;
 	-/ Entrada _ Salida /-
 }
 
 b4 = 21 % 2;
 b4 = 21 DIV 2;
+b4 = 21 MOD 2;
 
 -/ Prueba seleccion /-
 
-IF (b5==30)
+IF (b5>30 AND b5<40)
 {
-	b4=b5;
+	WRITE "Condicion doble AND";
 }
-ELSE
-{
-	a1=a1+a2;
-}
+
+-/ El compilador permite sentencias WRITE CTE_STR sin tener de declaraciones /-
+-/ Para probarlo copiar este bloque, borrar el contenido de este archivo, pegar y compilar /-
+WRITE "str 1";
+WRITE "str 2";
+WRITE "str 3";
+WRITE "str 4";

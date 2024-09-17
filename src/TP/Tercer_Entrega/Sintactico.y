@@ -235,23 +235,52 @@ tsimbolos ts[100];
 
 %%
 start:	programa	{
-	
-	
+
+
 	printf("\n---------------------------\n");
 	printf("\n****COMPILACION EXITOSA****\n");
 	printf("\n---------------------------\n");
-	
+
 	nodo_start=nodo_sentencias;
-	arbol_ejecucion->p_nodo = obtener_raiz(nodo_start);	
-	
+	arbol_ejecucion->p_nodo = obtener_raiz(nodo_start);
+
 	crearAssembler(arbol_ejecucion->p_nodo);
     //recorrer_en_orden(arbol_ejecucion->p_nodo,&visitar);
 }
 
-programa: declaracion  inicio  						 
-         |declaracion
-		 |lista_io
-									
+programa: declaracion  inicio
+	| declaracion
+	| lista_io
+;
+
+/*
+	lista_io permite escribir sentencias WRITE "str"
+	sin necesidad de escribir un bloque de declaraciones
+*/
+lista_io: lista_io entsal {
+		printf("\n***REGLA 14 -> Sentencia:\n");
+		printf("\t\t\tEntSal\n");
+		nodo_sentencia = crear_nodo_arbol(crear_info(";"),nodo_entsal,NULL);
+		insertar_en_cola(&cola_sentencias,crear_info_sentencias(nodo_sentencia));
+
+		if(cola_sentencias!=NULL) {
+			t_info_sentencias * sentencia_apilada = sacar_de_cola(&cola_sentencias);
+			nodo_sentencias->nodo_der = sentencia_apilada->a;
+			nodo_sentencias->nodo_der->padre = nodo_sentencias;
+			nodo_sentencias = sentencia_apilada->a;
+		}
+	}
+ | entsal {
+		printf("\n***REGLA 14 -> Sentencia:\n");
+		printf("\t\t\tEntSal\n");
+		nodo_sentencia = crear_nodo_arbol(crear_info(";"),nodo_entsal,NULL);
+		insertar_en_cola(&cola_sentencias,crear_info_sentencias(nodo_sentencia));
+
+		if(cola_sentencias!=NULL) {
+			t_info_sentencias * sentencia_apilada = sacar_de_cola(&cola_sentencias);
+			nodo_sentencias = sentencia_apilada->a;
+		}
+ }
 ;
 
 declaracion: DECVAR definicion ENDDEC {
@@ -298,7 +327,7 @@ tipo_dato: INTEGER {
 inicio:	lista_sentencias {
 		printf("\n***REGLA 8 -> Inicio:\n");
 		printf("\t\t\tLista_Sentencias\n");
-		
+
 	}
 ;
 
@@ -327,7 +356,7 @@ lista_sentencias: sentencia {
 sentencia:asignacion {
 		printf("\n***REGLA 11 -> Sentencia:\n");
 		printf("\t\t\tAsignacion\n");
-        
+
 		nodo_sentencia = crear_nodo_arbol(crear_info(";"),nodo_asignacionmult,NULL);
 		insertar_en_cola(&cola_sentencias,crear_info_sentencias(nodo_sentencia));
 		//recorrer_en_orden(nodo_sentencia,&visitar);
@@ -384,7 +413,7 @@ asignacion: lista_id OPE_ASIG expresion PUNTO_COMA {
 			printf("Error datos de diferente tipo");
 			exit(0);
 		}*/
-		
+
 		t_info_sentencias * p_info = sacar_de_pila(&pila_expresiones);
 		nodo_asignacionmult = crear_nodo_arbol(crear_info("="),crear_hoja(crear_info($1)),p_info->a);
 	}
@@ -397,20 +426,16 @@ lista_id:ID {
 
 		nodo_id1 = crear_hoja(crear_info($1));
 		//insertar_en_cola(&cola_id,crear_info_sentencias(nodo_id1));
-	    
+
 		cont=cont +1;
 	}
-	|   lista_id OPE_ASIG ID{
-		
+	| lista_id OPE_ASIG ID{
+
 		printf("\n***REGLA 17 -> Lista_id:\n");
 		printf("\t\t\tlista_asig OPE_ASIG ID\n");
 		existe_Id($1);
-		
-		 cont=cont +1;
-		 
-		
-		
-	
+
+		cont=cont +1;
 	}
 ;
 
@@ -419,10 +444,16 @@ entsal: WRITE CTE_STR PUNTO_COMA {
 		printf("\t\t\t WRITE CTE_STR PUNTO_COMA\n");
 
 		agregar_tipo_a_TS(yylval.str,"CTE_STR");
-        
-        nodo_print=crear_nodo_arbol(crear_info("WRITE"),crear_hoja(crear_info($1)),NULL);
-		//nodo_entsal=nodo_print;
-		
+
+		char cad[10];
+		char cad1[10];
+		strcpy(cad,"_cte");
+		n++;
+		sprintf(cad1,"%d",n);
+		strcat(cad,cad1);
+
+		nodo_print = crear_nodo_arbol(crear_info("WRITE"),crear_hoja(crear_info(cad)),NULL);
+		nodo_entsal=nodo_print;
 	}
 	| WRITE ID PUNTO_COMA {
 		printf("\n***REGLA 19 -> EntSal: \n");
@@ -613,7 +644,7 @@ condicion_doble: condicion_simple AND condicion_simple {
 iteracion:WHILE condicion L_A lista_sentencias  { sentencias_while=obtener_raiz(nodo_sentencias);}L_C {
 		printf("\n***REGLA 34 -> Iteracion:\n");
 		printf("\t\t\t WHILE Condicion L_A Lista_Sentencias L_C\n");
-		
+
 		t_info_sentencias * p_info = sacar_de_pila(&pila_condiciones);
 		nodo_iteracion = crear_nodo_arbol(crear_info("WHILE"),p_info->a,sentencias_while);
 		//recorrer_en_orden(nodo_iteracion,&visitar);
@@ -844,16 +875,6 @@ factor: ID {
 	}
 ;
 
-lista_io: lista_io entsal {
-		printf("\n***REGLA 48 -> Lista_io:\n");
-		printf("\t\t\t Lista_io -> Lista_io Entrada\n");
-	}
-	| entsal {
-		printf("\n***REGLA 49 -> Lista_io:\n");
-		printf("\t\t\t Lista_io -> Entrada\n");
-	}
-;
-
 %%
 
 int main(int argc,char *argv[])
@@ -879,11 +900,11 @@ int main(int argc,char *argv[])
 		crear_arbol(&arbol_ejecucion);
 
 		yyparse();
-       
+
 		guardarTabladeSimbolosEnUnArchivo();
         arbol_ejecucion->p_nodo = obtener_raiz(nodo_start);
-	    print_t(arbol_ejecucion->p_nodo);	
-		
+	    print_t(arbol_ejecucion->p_nodo);
+
 	}
 	fclose(yyin);
 	return 0;
@@ -916,19 +937,19 @@ t_info * crear_info(char * str)
 t_nodo_arbol * crear_nodo_arbol(t_info * info, t_nodo_arbol * p_nodo_izq, t_nodo_arbol * p_nodo_der)
 {
 	t_nodo_arbol * p_nodo = (t_nodo_arbol * ) malloc(sizeof(t_nodo_arbol));
-	
+
 	p_nodo->padre = NULL;
 	p_nodo->info= info;
 	p_nodo->nodo_der = p_nodo_der;
 	p_nodo->nodo_izq = p_nodo_izq;
-	
+
 
 	if(p_nodo_der)
 	p_nodo_der->padre = p_nodo;
 	if(p_nodo_izq)
 	p_nodo_izq->padre = p_nodo;
-	
-	
+
+
 	return p_nodo;
 }
 
@@ -1249,7 +1270,7 @@ void crearAssembler(t_nodo_arbol *arbol)
 		fprintf(a, "%s", buf);
 		fprintf(a, ":");
 		whiles--;
-		
+
 	}
 
 	fprintf(a, "\n\nmov AX, 4C00h");
@@ -1275,7 +1296,7 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 			strcpy(asig_final, "\nfld ");
 			strcat(asig_final, "aux1");
 			strcat(asig_final, "\nfstp ");
-			strcat(asig_final, n->nodo_izq->info->a);//coloca el resultado en el Resto 
+			strcat(asig_final, n->nodo_izq->info->a);//coloca el resultado en el Resto
 		}
 		//Si no es una Asignacion , pregunta si es una +
 	}	else if(strcmp(n->info->a,"+")==0) {
@@ -1626,7 +1647,7 @@ void recorrer_asm(t_nodo_arbol *n, int usar_aux2)
 	} else if(strcmp(n->info->a,"WRITE")==0 && strcmp(n->padre->info->a,";")==0) {
          //printf("%s\n",n->nodo_izq->info->a);
 		int tipo = traer_tipo_con_prefijo(n->nodo_izq->info->a);
-      
+
 		if(tipo == 1) {
 			fprintf(a, "\nDisplayFloat ");
 			fprintf(a, "%s", n->nodo_izq->info->a);
